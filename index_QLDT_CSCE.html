@@ -1,0 +1,652 @@
+<title>Cổng Đào Tạo CTUMP</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Roboto:wght@400;500;700&display=swap');
+
+  :root{
+    --blue:#2952A2;
+    --blue-dark:#173463;
+    --blue-tint:#EEF3FB;
+    --blue-tint-2:#E1E9F7;
+    --red:#D52027;
+    --yellow:#FDEE17;
+    --ink:#16213A;
+    --ink-soft:#57628A;
+    --line:#DCE3F0;
+    --paper:#FFFFFF;
+    --paper-alt:#F7F9FD;
+    --ok:#1E8E5A;
+    --ok-tint:#E7F6EE;
+    --full-tint:#FDEBEC;
+    font-synthesis:none;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper-alt);
+    color:var(--ink);
+    font-family:'Roboto',system-ui,-apple-system,Segoe UI,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.mont{font-family:'Montserrat',system-ui,sans-serif;}
+  h1,h2,h3{text-wrap:balance; margin:0;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+  img{max-width:100%;}
+
+  /* ---------- prototype notice ---------- */
+  .proto-banner{
+    background:var(--ink);
+    color:#fff;
+    font-size:12.5px;
+    text-align:center;
+    padding:7px 16px;
+    letter-spacing:.01em;
+  }
+  .proto-banner b{color:var(--yellow);}
+
+  /* ---------- top utility bar ---------- */
+  .utility{
+    background:var(--blue-dark);
+    color:#cfdaf2;
+    font-size:12.5px;
+  }
+  .utility .wrap{
+    max-width:1180px;margin:0 auto;padding:6px 20px;
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .utility a{opacity:.92;}
+  .utility a:hover{opacity:1;text-decoration:underline;}
+  .utility .sep{opacity:.4;margin:0 8px;}
+
+  /* ---------- header / nav ---------- */
+  header.site{
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:40;
+  }
+  .brand-row{
+    max-width:1180px;margin:0 auto;padding:12px 20px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .brand-mark{
+    width:52px;height:52px;border-radius:50%;
+    background:var(--blue);
+    display:flex;align-items:center;justify-content:center;
+    flex:none;
+    box-shadow:inset 0 0 0 3px #fff, inset 0 0 0 4px var(--blue);
+  }
+  .brand-mark svg{width:28px;height:28px;}
+  .brand-text .school{
+    font-size:11px;color:var(--ink-soft);letter-spacing:.03em;text-transform:uppercase;
+  }
+  .brand-text .unit{
+    font-family:'Montserrat';font-weight:800;color:var(--blue);font-size:15px;line-height:1.25;
+    letter-spacing:.01em;
+  }
+  .brand-row .spacer{flex:1;}
+  .hotline{
+    text-align:right;font-size:13px;color:var(--ink-soft);
+  }
+  .hotline strong{display:block;color:var(--red);font-family:'Montserrat';font-size:16px;}
+
+  nav.mainnav{background:var(--blue);}
+  nav.mainnav .wrap{
+    max-width:1180px;margin:0 auto;padding:0 20px;
+    display:flex;flex-wrap:wrap;
+  }
+  nav.mainnav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;}
+  nav.mainnav li{position:relative;}
+  nav.mainnav > .wrap > ul > li > a,
+  nav.mainnav > .wrap > ul > li > button.toplink{
+    display:flex;align-items:center;gap:6px;
+    padding:13px 16px;color:#fff;font-family:'Montserrat';font-weight:700;
+    font-size:13.5px;letter-spacing:.02em;text-transform:uppercase;
+    background:none;border:none;cursor:pointer;
+  }
+  nav.mainnav > .wrap > ul > li.active > a,
+  nav.mainnav > .wrap > ul > li.active > button.toplink,
+  nav.mainnav > .wrap > ul > li:hover > a,
+  nav.mainnav > .wrap > ul > li:hover > button.toplink{
+    background:var(--blue-dark);
+  }
+  nav.mainnav .caret{font-size:9px;opacity:.85;transform:translateY(1px);}
+  .submenu{
+    display:none;position:absolute;left:0;top:100%;min-width:250px;
+    background:#fff;box-shadow:0 14px 30px -10px rgba(23,52,99,.35);
+    border-top:3px solid var(--red);padding:6px 0;z-index:50;
+  }
+  nav.mainnav li:hover > .submenu{display:block;}
+  .submenu a{
+    display:block;padding:10px 18px;font-size:13.5px;color:var(--ink);border-bottom:1px solid var(--paper-alt);
+  }
+  .submenu a:last-child{border-bottom:none;}
+  .submenu a:hover{background:var(--blue-tint);color:var(--blue);}
+  .submenu-group{
+    padding:9px 18px 4px;font-family:'Montserrat';font-weight:700;font-size:10.5px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);
+    border-top:1px solid var(--line);margin-top:4px;
+  }
+  .submenu a.submenu-sub{padding-left:28px;font-size:13px;}
+
+  .portal-cta{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--red);color:#fff !important;font-family:'Montserrat';font-weight:700;
+    font-size:12.5px;padding:9px 16px;border-radius:7px;white-space:nowrap;
+  }
+  .portal-cta:hover{background:#b81920;}
+
+  /* ---------- page hero ---------- */
+  .hero{
+    background:linear-gradient(100deg,var(--blue-dark),var(--blue) 70%);
+    color:#fff;padding:34px 20px 28px;
+  }
+  .hero .wrap{max-width:1180px;margin:0 auto;}
+  .crumb{font-size:12.5px;color:#cfdaf2;margin-bottom:8px;}
+  .crumb b{color:#fff;}
+  .hero h1{font-size:26px;color:#fff;letter-spacing:.01em;}
+
+  /* ---------- shared section shell ---------- */
+  main{max-width:1180px;margin:0 auto;padding:0 20px 64px;}
+  section.menu-block{padding-top:44px;scroll-margin-top:120px;}
+  .block-head{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+    flex-wrap:wrap;margin-bottom:18px;
+  }
+  .eyebrow{
+    font-family:'Montserrat';font-weight:700;font-size:12px;letter-spacing:.12em;
+    color:var(--red);text-transform:uppercase;margin-bottom:4px;
+  }
+  .block-head h2{font-size:22px;color:var(--blue-dark);}
+  .block-note{font-size:13px;color:var(--ink-soft);max-width:420px;}
+
+  /* ---------- tabs (Lich khai giang) ---------- */
+  .tabbar{display:flex;gap:8px;background:var(--blue-tint);padding:5px;border-radius:10px;width:max-content;}
+  .tabbar button{
+    border:none;background:transparent;padding:9px 20px;border-radius:7px;
+    font-family:'Montserrat';font-weight:700;font-size:13px;color:var(--ink-soft);cursor:pointer;
+  }
+  .tabbar button.active{background:#fff;color:var(--blue);box-shadow:0 2px 6px rgba(23,52,99,.14);}
+
+  .card-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px;margin-top:20px;
+  }
+
+  /* schedule card */
+  .sched-card{
+    background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;
+    display:flex;flex-direction:column;gap:10px;position:relative;border-top:3px solid var(--blue);
+  }
+  .sched-card .badge{
+    position:absolute;top:12px;right:12px;font-size:11px;font-weight:700;font-family:'Montserrat';
+    padding:3px 9px;border-radius:20px;letter-spacing:.02em;
+  }
+  .badge.open{background:var(--ok-tint);color:var(--ok);}
+  .badge.full{background:var(--full-tint);color:var(--red);}
+  .badge.done{background:var(--blue-tint);color:var(--blue);}
+  .sched-card h3{font-size:14.5px;line-height:1.35;padding-right:70px;color:var(--ink);}
+  .meta-list{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--ink-soft);}
+  .meta-list div{display:flex;gap:6px;}
+  .meta-list span.k{flex:none;color:var(--ink);opacity:.6;min-width:82px;}
+  .meta-list span.v{font-variant-numeric:tabular-nums;color:var(--ink);}
+  .sched-foot{
+    margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .fee{font-family:'Montserrat';font-weight:800;color:var(--blue);font-size:15px;}
+  .btn{
+    font-family:'Montserrat';font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:7px;
+    border:none;cursor:pointer;white-space:nowrap;
+  }
+  .btn.primary{background:var(--red);color:#fff;}
+  .btn.primary:hover{background:#b81920;}
+  .btn.disabled{background:var(--paper-alt);color:var(--ink-soft);cursor:not-allowed;border:1px solid var(--line);}
+
+  /* ---------- dao tao category pills ---------- */
+  .pillbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+  .pillbar button{
+    border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);
+    font-family:'Montserrat';font-weight:700;font-size:12.5px;padding:8px 16px;border-radius:30px;cursor:pointer;
+  }
+  .pillbar button.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+  .cat-section{margin-bottom:8px;}
+  .cat-bar{
+    background:var(--blue-dark);color:#fff;padding:11px 16px;border-radius:8px 8px 0 0;
+    display:flex;align-items:center;gap:9px;font-family:'Montserrat';font-weight:700;font-size:14px;
+  }
+  .cat-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--yellow);flex:none;}
+  .cat-body{
+    border:1px solid var(--line);border-top:none;border-radius:0 0 8px 8px;background:#fff;padding:18px;
+  }
+
+  .course-card{
+    display:flex;gap:12px;padding:13px;border:1px solid var(--line);border-radius:10px;background:var(--paper-alt);
+  }
+  .course-thumb{
+    width:46px;height:46px;border-radius:9px;background:var(--blue-tint-2);color:var(--blue);
+    display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .course-thumb svg{width:22px;height:22px;}
+  .course-body h4{font-family:'Montserrat';font-weight:700;font-size:13.5px;line-height:1.3;color:var(--ink);margin-bottom:5px;}
+  .course-mini{font-size:12px;color:var(--ink-soft);margin-bottom:6px;}
+  .course-more{font-size:12.5px;font-weight:700;color:var(--blue);}
+  .course-more:hover{text-decoration:underline;}
+
+  .empty-note{
+    display:flex;align-items:center;gap:14px;background:var(--paper-alt);border:1px dashed var(--line);
+    border-radius:10px;padding:18px;color:var(--ink-soft);font-size:13.5px;
+  }
+  .empty-note b{color:var(--ink);}
+
+  /* ---------- the hoc vien tool ---------- */
+  .tool-panel{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start;}
+  .tool-info{
+    background:#fff;border:1px solid var(--line);border-top:3px solid var(--red);
+    border-radius:12px;padding:20px;font-size:13.5px;color:var(--ink-soft);line-height:1.6;
+  }
+  .tool-info p{margin:0 0 12px;}
+  .tool-info b{color:var(--ink);}
+  .tool-features{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:9px;}
+  .tool-features li{padding-left:16px;position:relative;}
+  .tool-features li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--blue);}
+  .tool-info code{background:var(--blue-tint);color:var(--blue-dark);padding:1px 5px;border-radius:4px;font-size:12px;}
+  .tool-frame-wrap{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;}
+  .tool-frame-bar{
+    background:var(--paper-alt);border-bottom:1px solid var(--line);padding:8px 14px;
+    font-size:12px;color:var(--ink-soft);font-family:'Roboto',monospace;
+  }
+  .tool-frame{width:100%;height:720px;border:none;display:block;}
+
+  @media (max-width:900px){
+    .tool-panel{grid-template-columns:1fr;}
+    .tool-frame{height:560px;}
+  }
+
+  /* ---------- footer ---------- */
+  footer{background:var(--blue-dark);color:#c9d5ef;padding:34px 20px 20px;font-size:13px;margin-top:40px;}
+  footer .wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:24px;}
+  footer h5{font-family:'Montserrat';color:#fff;font-size:13px;letter-spacing:.05em;margin-bottom:10px;}
+  footer a{display:block;opacity:.85;padding:3px 0;}
+  footer a:hover{opacity:1;text-decoration:underline;}
+  footer .copy{max-width:1180px;margin:22px auto 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.14);opacity:.7;font-size:12px;}
+
+  @media (max-width:760px){
+    .hotline{display:none;}
+    .portal-cta{font-size:11.5px;padding:8px 12px;}
+    nav.mainnav ul{width:100%;justify-content:flex-start;}
+    footer .wrap{grid-template-columns:1fr;}
+  }
+</style>
+
+<div class="proto-banner">🛠️ <b>BẢN DỰNG THỬ</b> — mô phỏng 2 mục menu “Lịch khai giảng” &amp; “Đào tạo” theo cấu trúc tham chiếu từ chpthcm.ump.edu.vn, dựng riêng cho trang boi-duong-va-cap-nhat-kien-thuc.html của CTUMP. Số khóa/ngày khai giảng bên dưới là <b>dữ liệu minh họa</b> — cần Phòng/Trung tâm Đào tạo xác nhận trước khi đưa lên web thật.</div>
+
+<div class="utility">
+  <div class="wrap">
+    <div>ĐT: (0292) 3 508176 <span class="sep">|</span> Zalo: (0941) 508 176 <span class="sep">|</span> <a href="mailto:dvdttncxh@ctump.edu.vn">dvdttncxh@ctump.edu.vn</a></div>
+    <div><a href="#">Đăng nhập</a> <span class="sep">|</span> <a href="#">Đăng ký</a></div>
+  </div>
+</div>
+
+<header class="site">
+  <div class="brand-row">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2v20M4 8h16M4 16h16" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="brand-text">
+      <div class="school">Trường Đại học Y Dược Cần Thơ</div>
+      <div class="unit">TRUNG TÂM DỊCH VỤ VÀ ĐÀO TẠO<br>THEO NHU CẦU XÃ HỘI</div>
+    </div>
+    <div class="spacer"></div>
+    <a class="portal-cta" href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/" target="_blank" rel="noopener">
+      Cổng dịch vụ công trực tuyến ↗
+    </a>
+    <div class="hotline">Hotline tuyển sinh<strong>0941 508 176</strong></div>
+  </div>
+
+  <nav class="mainnav">
+    <div class="wrap">
+      <ul>
+        <li><a href="#">Trang chủ</a></li>
+        <li><a href="#">Giới thiệu</a></li>
+
+        <li class="active">
+          <button class="toplink" data-goto="lich-khai-giang">Lịch khai giảng <span class="caret">▾</span></button>
+          <div class="submenu">
+            <a href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/" target="_blank" rel="noopener">Danh mục các khóa đào tạo ↗</a>
+            <a href="#lich-khai-giang" data-tab-target="sap">Sắp khai giảng</a>
+            <a href="#lich-khai-giang" data-tab-target="da">Đã khai giảng</a>
+            <a href="#">Thông báo</a>
+            <div class="submenu-group">Đăng ký khóa học</div>
+            <a class="submenu-sub" href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=cc" target="_blank" rel="noopener">Khoá đào tạo cấp Chứng chỉ ↗</a>
+            <a class="submenu-sub" href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=hnht" target="_blank" rel="noopener">Khoá đào tạo cấp Giấy chứng nhận ↗</a>
+            <a class="submenu-sub" href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=hnht" target="_blank" rel="noopener">Hội nghị - Hội thảo ↗</a>
+            <a class="submenu-sub" href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=cdnn" target="_blank" rel="noopener">Bồi dưỡng theo tiêu chuẩn CDNN ↗</a>
+            <a class="submenu-sub" href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=avth" target="_blank" rel="noopener">Lớp Anh văn - Tin học ↗</a>
+          </div>
+        </li>
+
+        <li class="active">
+          <button class="toplink" data-goto="dao-tao">Đào tạo <span class="caret">▾</span></button>
+          <div class="submenu">
+            <a href="#dao-tao" data-cat-target="sdh">Bồi dưỡng Sau đại học</a>
+            <a href="#dao-tao" data-cat-target="cnkt">Bồi dưỡng và cập nhật kiến thức</a>
+            <a href="#dao-tao" data-cat-target="pck">Phổ cập kiến thức cộng đồng</a>
+            <a href="#dao-tao" data-cat-target="lkdt">Liên kết đào tạo</a>
+          </div>
+        </li>
+
+        <li><a href="#">Văn bản - Biểu mẫu</a></li>
+        <li><a href="#">Quản lý dịch vụ</a></li>
+
+        <li class="active">
+          <button class="toplink" data-goto="the-hoc-vien">Thẻ học viên <span class="caret">▾</span></button>
+          <div class="submenu">
+            <a id="tool-open-link-nav" href="Trinh_tao_the_hoc_vien.html" target="_blank" rel="noopener">Mở trình tạo thẻ ↗</a>
+            <div class="submenu-group">Công cụ nội bộ</div>
+            <a class="submenu-sub" href="#the-hoc-vien">Hướng dẫn sử dụng</a>
+          </div>
+        </li>
+
+        <li><a href="#">Liên hệ</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="crumb">Trang chủ / <b>Lịch khai giảng &amp; Đào tạo</b></div>
+    <h1>Lịch khai giảng &amp; Chương trình đào tạo</h1>
+  </div>
+</div>
+
+<main>
+
+  <!-- ================= LICH KHAI GIANG ================= -->
+  <section class="menu-block" id="lich-khai-giang">
+    <div class="block-head">
+      <div>
+        <div class="eyebrow">Lịch khai giảng</div>
+        <h2>Các khóa sắp và đã khai giảng</h2>
+      </div>
+      <div class="block-note">Cập nhật theo tiến độ tuyển sinh của từng khóa. Bấm “Đăng ký học” để chuyển sang <a href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline;">Cổng dịch vụ công trực tuyến</a> của trường.</div>
+    </div>
+
+    <div class="tabbar" id="sched-tabs">
+      <button class="active" data-tab="sap">Sắp khai giảng</button>
+      <button data-tab="da">Đã khai giảng</button>
+    </div>
+
+    <div class="card-grid" id="sched-sap">
+      <!-- cards injected -->
+    </div>
+    <div class="card-grid" id="sched-da" style="display:none;">
+      <!-- cards injected -->
+    </div>
+  </section>
+
+  <!-- ================= DAO TAO ================= -->
+  <section class="menu-block" id="dao-tao">
+    <div class="block-head">
+      <div>
+        <div class="eyebrow">Đào tạo</div>
+        <h2>Chương trình theo nhóm đào tạo</h2>
+      </div>
+      <div class="block-note">Nội dung nhóm “Bồi dưỡng và cập nhật kiến thức” lấy từ dữ liệu đang đăng trên ctump.edu.vn; các nhóm còn lại là khung đề xuất, tham chiếu Danh mục khóa đào tạo của Trung tâm.</div>
+    </div>
+
+    <div class="pillbar" id="cat-pills">
+      <button class="active" data-cat="all">Tất cả</button>
+      <button data-cat="sdh">Bồi dưỡng Sau đại học</button>
+      <button data-cat="cnkt">Bồi dưỡng &amp; cập nhật kiến thức</button>
+      <button data-cat="pck">Phổ cập kiến thức cộng đồng</button>
+      <button data-cat="lkdt">Liên kết đào tạo</button>
+    </div>
+
+    <div id="cat-sdh" class="cat-section">
+      <div class="cat-bar"><span class="dot"></span>Bồi dưỡng Sau đại học</div>
+      <div class="cat-body"><div class="card-grid" id="grid-sdh"></div></div>
+    </div>
+
+    <div id="cat-cnkt" class="cat-section" style="margin-top:22px;">
+      <div class="cat-bar"><span class="dot"></span>Bồi dưỡng và cập nhật kiến thức</div>
+      <div class="cat-body"><div class="card-grid" id="grid-cnkt"></div></div>
+    </div>
+
+    <div id="cat-pck" class="cat-section" style="margin-top:22px;">
+      <div class="cat-bar"><span class="dot"></span>Phổ cập kiến thức cộng đồng</div>
+      <div class="cat-body"><div class="card-grid" id="grid-pck"></div></div>
+    </div>
+
+    <div id="cat-lkdt" class="cat-section" style="margin-top:22px;">
+      <div class="cat-bar"><span class="dot"></span>Liên kết đào tạo</div>
+      <div class="cat-body">
+        <div class="empty-note">
+          <span style="font-size:22px;">🕊️</span>
+          <div><b>Đang cập nhật.</b> Trung tâm sẽ đăng danh sách chương trình liên kết đào tạo với các đơn vị đối tác khi có quyết định chính thức. Liên hệ <a href="mailto:dvdttncxh@ctump.edu.vn" style="color:var(--blue);display:inline;">dvdttncxh@ctump.edu.vn</a> để biết thêm.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THE HOC VIEN (cong cu noi bo) ================= -->
+  <section class="menu-block" id="the-hoc-vien">
+    <div class="block-head">
+      <div>
+        <div class="eyebrow">Công cụ nội bộ</div>
+        <h2>Trình tạo thẻ học viên ĐTLT</h2>
+      </div>
+      <div class="block-note">Chỉ dành cho cán bộ phụ trách in thẻ — không hiển thị mục này khi bàn giao lên web công khai ctump.edu.vn.</div>
+    </div>
+
+    <div class="tool-panel">
+      <div class="tool-info">
+        <p>Ứng dụng 1 file, chạy ngay trong trình duyệt, <b>không cần cài đặt, không cần Internet</b>.
+        Dùng để quản lý danh sách học viên và thiết kế/in thẻ khổ 5,5×8,5&nbsp;cm (dọc) hoặc 8,5×5,5&nbsp;cm (ngang) cho từng khóa đào tạo theo nhu cầu xã hội.</p>
+        <ul class="tool-features">
+          <li><b>Học viên</b> — thêm/sửa/xoá, dán danh sách từ Excel/Word, xuất–nhập mẫu Excel, gán ảnh hàng loạt.</li>
+          <li><b>Mẫu thẻ</b> — chọn thẻ dọc/ngang, lưu bố cục riêng để dùng lại cho khóa sau.</li>
+          <li><b>Thiết kế</b> — kéo-thả, sửa chữ tại chỗ, chỉnh phông/màu/cỡ, thêm mã vạch/QR từ Mã học viên.</li>
+          <li><b>Xuất bản</b> — in trực tiếp, xuất PDF (1 thẻ/trang hoặc xếp A4 để cắt) hoặc PNG.</li>
+          <li><b>Lưu dự án / Mở dự án</b> — mang danh sách, ảnh, mẫu thẻ theo file <code>.json</code> sang máy khác.</li>
+        </ul>
+        <a id="tool-open-btn" class="btn primary" style="display:inline-block;margin-top:6px;" href="Trinh_tao_the_hoc_vien.html" target="_blank" rel="noopener">Mở trình tạo thẻ trong tab mới ↗</a>
+      </div>
+      <div class="tool-frame-wrap" id="tool-frame-wrap">
+        <div class="tool-frame-bar" id="tool-frame-bar">Trinh_tao_the_hoc_vien.html — xem trực tiếp bên dưới</div>
+        <iframe class="tool-frame" id="tool-frame" src="Trinh_tao_the_hoc_vien.html" loading="lazy" title="Trình tạo thẻ học viên ĐTLT"></iframe>
+      </div>
+      <div class="empty-note" id="tool-online-note" style="display:none;">
+        <span style="font-size:22px;">💳</span>
+        <div><b>Xem trực tiếp chỉ hoạt động khi mở file trên máy (file <code>Trinh_tao_the_hoc_vien.html</code> cùng thư mục).</b>
+        Đang xem bản online nên bấm nút "Mở trình tạo thẻ trong tab mới ↗" bên trái để dùng bản đã đăng: <a id="tool-online-link" href="https://claude.ai/code/artifact/318bd430-071f-4b78-b43c-80a0ae1bb896" target="_blank" rel="noopener" style="color:var(--blue);display:inline;">xem tại đây ↗</a> (cần đăng nhập Claude).</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h5>TRUNG TÂM DỊCH VỤ VÀ ĐÀO TẠO THEO NHU CẦU XÃ HỘI</h5>
+      <div style="opacity:.85;line-height:1.7;">
+        Số 179, đường Nguyễn Văn Cừ, P. Tân An, TP. Cần Thơ<br>
+        ĐT: (0292) 3 508176 — Zalo: 0941 508 176<br>
+        Email: dvdttncxh@ctump.edu.vn
+      </div>
+    </div>
+    <div>
+      <h5>LỊCH KHAI GIẢNG</h5>
+      <a href="#lich-khai-giang">Sắp khai giảng</a>
+      <a href="#lich-khai-giang">Đã khai giảng</a>
+      <a href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/">Danh mục khóa đào tạo</a>
+    </div>
+    <div>
+      <h5>ĐÀO TẠO</h5>
+      <a href="#dao-tao">Bồi dưỡng Sau đại học</a>
+      <a href="#dao-tao">Bồi dưỡng &amp; cập nhật kiến thức</a>
+      <a href="#dao-tao">Phổ cập kiến thức cộng đồng</a>
+      <a href="#dao-tao">Liên kết đào tạo</a>
+    </div>
+    <div>
+      <h5>DỊCH VỤ CÔNG TRỰC TUYẾN</h5>
+      <a href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/" target="_blank" rel="noopener">Danh mục khóa đào tạo ↗</a>
+      <a href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=cc" target="_blank" rel="noopener">Đăng ký cấp Chứng chỉ ↗</a>
+      <a href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=hnht" target="_blank" rel="noopener">Đăng ký Giấy chứng nhận / Hội thảo ↗</a>
+      <a href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=cdnn" target="_blank" rel="noopener">Bồi dưỡng theo tiêu chuẩn CDNN ↗</a>
+      <a href="https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/?dv=avth" target="_blank" rel="noopener">Lớp Anh văn - Tin học ↗</a>
+    </div>
+  </div>
+  <div class="copy">Bản dựng thử giao diện — Trường Đại học Y Dược Cần Thơ. Không dùng để thay thế nội dung chính thức trên ctump.edu.vn. Mục "Thẻ học viên" là công cụ nội bộ, không đưa lên bản công khai.</div>
+</footer>
+
+<script>
+  // ---- Cổng dịch vụ công trực tuyến ----
+  const PORTAL = "https://htql.ctump.edu.vn/ctump/dichvucong/ttdv/";
+  const PORTAL_CC = PORTAL + "?dv=cc"; // các khóa trong danh sách mẫu đều thuộc nhóm "cấp Chứng chỉ" trên Cổng DVC
+
+  // ---- sample data ----
+  // Lich khai giang — SAP KHAI GIANG (minh hoa, tham khao danh muc khoa dao tao that cua CTUMP)
+  const SAP = [
+    {name:"Điện tâm đồ, Khóa 05", tiet:"270 tiết · 6 tháng", ngay:"15/09/2026", lich:"Thứ 3, 5 (13:30–16:30)", ht:"Trực tiếp", fee:"9.000.000đ", status:"open"},
+    {name:"Cấy ghép nha khoa cơ bản, Khóa 03", tiet:"6 tháng", ngay:"20/09/2026", lich:"Thứ 2,4,6", ht:"Trực tiếp", fee:"10.000.000đ", status:"full"},
+    {name:"Dinh dưỡng lâm sàng cơ bản, Khóa 07", tiet:"3 tháng", ngay:"22/09/2026", lich:"Thứ 7, CN (08:00–16:30)", ht:"Trực tiếp kết hợp trực tuyến", fee:"6.000.000đ", status:"open"},
+    {name:"Hộ lý cơ bản, Khóa 09", tiet:"3 tháng", ngay:"28/09/2026", lich:"Thứ 2–6 (17:30–20:30)", ht:"Trực tiếp", fee:"5.000.000đ", status:"open"},
+    {name:"Điều dưỡng hồi sức cấp cứu, Khóa 04", tiet:"3 tháng", ngay:"03/10/2026", lich:"Thứ 2,3,4,5,6", ht:"Trực tiếp", fee:"8.000.000đ", status:"open"},
+    {name:"Chuyên khoa Da liễu cơ bản, Khóa 12", tiet:"9 tháng", ngay:"06/10/2026", lich:"Ngoài giờ hành chính", ht:"Trực tiếp", fee:"22.500.000đ", status:"open"},
+  ];
+  // Lich khai giang — DA KHAI GIANG
+  const DA = [
+    {name:"Thủy châm, Khóa 02", tiet:"360 tiết · 3 tháng", ngay:"17/08/2026", lich:"—", ht:"Trực tuyến kết hợp trực tiếp", fee:"—", status:"done"},
+    {name:"Dụng cụ chỉnh hình và chân tay giả, Khóa 04", tiet:"750 tiết · 6 tháng", ngay:"17/08/2026", lich:"—", ht:"Trực tiếp kết hợp trực tuyến", fee:"—", status:"done"},
+    {name:"Bồi dưỡng chuyên khoa Da liễu, Khóa 21", tiet:"6 tháng", ngay:"25/08/2026", lich:"—", ht:"Trực tiếp", fee:"—", status:"done"},
+    {name:"Kỹ thuật thay khớp, Khóa 06", tiet:"270 tiết · 3 tháng", ngay:"01/09/2026", lich:"—", ht:"Tập trung", fee:"—", status:"done"},
+  ];
+
+  function schedCard(c){
+    const badge = c.status==="open" ? '<span class="badge open">Còn chỗ</span>'
+                : c.status==="full" ? '<span class="badge full">Đã đủ số lượng</span>'
+                : '<span class="badge done">Đang đào tạo</span>';
+    const cta = c.status==="open"
+      ? `<a class="btn primary" href="${PORTAL_CC}" target="_blank" rel="noopener">Đăng ký học ↗</a>`
+      : c.status==="full"
+      ? '<button class="btn disabled" disabled>Đã đủ số lượng</button>'
+      : '<button class="btn disabled" disabled>Đã khai giảng</button>';
+    return `<div class="sched-card">
+      ${badge}
+      <h3>${c.name}</h3>
+      <div class="meta-list">
+        <div><span class="k">Số tiết học</span><span class="v">${c.tiet}</span></div>
+        <div><span class="k">Khai giảng</span><span class="v">${c.ngay}</span></div>
+        <div><span class="k">Lịch học</span><span class="v">${c.lich}</span></div>
+        <div><span class="k">Hình thức</span><span class="v">${c.ht}</span></div>
+      </div>
+      <div class="sched-foot">
+        <div class="fee">${c.fee}</div>
+        ${cta}
+      </div>
+    </div>`;
+  }
+  document.getElementById('sched-sap').innerHTML = SAP.map(schedCard).join('');
+  document.getElementById('sched-da').innerHTML = DA.map(schedCard).join('');
+
+  document.getElementById('sched-tabs').addEventListener('click', e=>{
+    const btn = e.target.closest('button[data-tab]');
+    if(!btn) return;
+    document.querySelectorAll('#sched-tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const t = btn.dataset.tab;
+    document.getElementById('sched-sap').style.display = t==='sap' ? 'grid' : 'none';
+    document.getElementById('sched-da').style.display = t==='da' ? 'grid' : 'none';
+  });
+
+  // clicking submenu links that target a specific schedule tab
+  document.querySelectorAll('[data-tab-target]').forEach(a=>{
+    a.addEventListener('click', ()=>{
+      const target = a.dataset.tabTarget;
+      document.querySelector(`#sched-tabs button[data-tab="${target}"]`).click();
+    });
+  });
+
+  const ICONS = {
+    sdh: '<path d="M4 8l8-4 8 4-8 4-8-4Zm0 0v6c0 1.5 3.5 3 8 3s8-1.5 8-3V8" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/>',
+    cnkt:'<path d="M12 3v18M5 8h14M5 16h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+    pck: '<circle cx="12" cy="8" r="3.2" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/>'
+  };
+  function courseCard(c, icon){
+    return `<div class="course-card">
+      <div class="course-thumb"><svg viewBox="0 0 24 24">${ICONS[icon]}</svg></div>
+      <div class="course-body">
+        <h4>${c.name}</h4>
+        <div class="course-mini">${c.meta}</div>
+        <a href="${PORTAL_CC}" target="_blank" rel="noopener" class="course-more">Xem thêm ↗</a>
+      </div>
+    </div>`;
+  }
+
+  // Boi duong Sau dai hoc — mau, theo danh muc dao tao chuyen khoa co ban cua Trung tam
+  const SDH = [
+    {name:"Bồi dưỡng chuyên khoa Da liễu", meta:"6 tháng · Trực tiếp"},
+    {name:"Bồi dưỡng chuyên khoa Gây mê hồi sức", meta:"6 tháng · Trực tiếp"},
+    {name:"Chuyên khoa Nội khoa cơ bản", meta:"9 tháng · Trực tiếp"},
+    {name:"Chuyên khoa Sản phụ khoa cơ bản", meta:"9 tháng · Trực tiếp"},
+    {name:"Chuyên khoa Phục hồi chức năng cơ bản", meta:"9 tháng · Trực tiếp"},
+    {name:"Hoạt động trị liệu cơ bản", meta:"12 tháng · Trực tiếp"},
+  ];
+  // Boi duong va Cap nhat kien thuc — du lieu that dang tren ctump.edu.vn
+  const CNKT = [
+    {name:"Thủy châm", meta:"360 tiết · Trực tuyến kết hợp trực tiếp"},
+    {name:"Dụng cụ chỉnh hình và chân tay giả", meta:"750 tiết · Trực tiếp kết hợp trực tuyến"},
+    {name:"Dụng cụ chỉnh hình và chân tay giả nâng cao", meta:"360 tiết · Trực tiếp kết hợp trực tuyến"},
+    {name:"Kỹ thuật Y học chuyên ngành xét nghiệm", meta:"615 tiết · Tập trung"},
+    {name:"Kỹ thuật thay khớp", meta:"270 tiết · Tập trung"},
+    {name:"Nội soi phế quản", meta:"630 tiết · Tập trung"},
+    {name:"Phẫu thuật hàm mặt cơ bản", meta:"600 tiết · Tập trung"},
+  ];
+  // Pho cap kien thuc cong dong — mau
+  const PCK = [
+    {name:"Hộ lý", meta:"6 tháng · Trực tiếp"},
+    {name:"Hộ lý cơ bản", meta:"3 tháng · Trực tiếp"},
+    {name:"Người hỗ trợ chăm sóc tại nhà", meta:"3 tháng · Trực tiếp"},
+  ];
+
+  document.getElementById('grid-sdh').innerHTML = SDH.map(c=>courseCard(c,'sdh')).join('');
+  document.getElementById('grid-cnkt').innerHTML = CNKT.map(c=>courseCard(c,'cnkt')).join('');
+  document.getElementById('grid-pck').innerHTML = PCK.map(c=>courseCard(c,'pck')).join('');
+
+  // category pills filter
+  const catSections = {sdh:'cat-sdh', cnkt:'cat-cnkt', pck:'cat-pck', lkdt:'cat-lkdt'};
+  document.getElementById('cat-pills').addEventListener('click', e=>{
+    const btn = e.target.closest('button[data-cat]');
+    if(!btn) return;
+    document.querySelectorAll('#cat-pills button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const cat = btn.dataset.cat;
+    Object.values(catSections).forEach(id=>document.getElementById(id).style.display = (cat==='all') ? '' : 'none');
+    if(cat!=='all') document.getElementById(catSections[cat]).style.display = '';
+  });
+  document.querySelectorAll('[data-cat-target]').forEach(a=>{
+    a.addEventListener('click', ()=>{
+      document.querySelector(`#cat-pills button[data-cat="${a.dataset.catTarget}"]`).click();
+    });
+  });
+
+  // top nav "toplink" buttons just scroll to the anchor
+  document.querySelectorAll('.toplink[data-goto]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.getElementById(b.dataset.goto).scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // "Thẻ học viên": file cùng thư mục chỉ nạp được khi mở trực tiếp bằng file://.
+  // Khi xem bản online (artifact, web server khác...) chuyển nút + khung xem sang bản đã đăng online.
+  if (location.protocol !== 'file:') {
+    const ONLINE_TOOL_URL = 'https://claude.ai/code/artifact/318bd430-071f-4b78-b43c-80a0ae1bb896';
+    document.getElementById('tool-open-btn').setAttribute('href', ONLINE_TOOL_URL);
+    document.getElementById('tool-open-link-nav').setAttribute('href', ONLINE_TOOL_URL);
+    document.getElementById('tool-frame-wrap').style.display = 'none';
+    document.getElementById('tool-online-note').style.display = 'flex';
+  }
+</script>
