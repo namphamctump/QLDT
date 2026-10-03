@@ -3,7 +3,7 @@ DirectoryIndex index.php
 Options -Indexes
 
 # Không cho truy cập trực tiếp file cấu hình, SQL, tài liệu nội bộ
-<FilesMatch "^(config\.php|config\.sample\.php|install\.sql|README\.md)$">
+<FilesMatch "^(config\.php|config\.sample\.php|install\.sql|README\.md|TAI_LIEU_MODULE_QLHC\.md)$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
