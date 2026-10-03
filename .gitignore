@@ -1,0 +1,5 @@
+# Module QLHC: cấu hình và file tải lên chỉ tồn tại trên hosting
+qlhc/config.php
+qlhc/uploads/*
+!qlhc/uploads/.htaccess
+!qlhc/uploads/index.html

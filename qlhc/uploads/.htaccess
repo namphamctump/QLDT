@@ -1,0 +1,8 @@
+# File tải lên chỉ được tải qua PHP có kiểm tra quyền — chặn truy cập trực tiếp
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>

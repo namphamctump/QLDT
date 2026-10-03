@@ -1,0 +1,26 @@
+# Module Quản lý hành chính (Apache / LiteSpeed)
+DirectoryIndex index.php
+Options -Indexes
+
+# Không cho truy cập trực tiếp file cấu hình, SQL, tài liệu nội bộ
+<FilesMatch "^(config\.php|config\.sample\.php|install\.sql|README\.md)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Tăng giới hạn tải file (nếu hosting cho phép đặt trong .htaccess)
+<IfModule mod_php.c>
+  php_value upload_max_filesize 20M
+  php_value post_max_size 25M
+</IfModule>
