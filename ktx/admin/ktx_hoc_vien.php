@@ -181,6 +181,12 @@ $phongList = $pdo->query("SELECT p.*, d.ten AS ten_day, d.gioi_tinh AS day_gioi_
 // ---- So lieu cho 4 the tong quan ----
 $demDangO = (int)$pdo->query("SELECT COUNT(*) FROM ktx_hoc_vien WHERE trang_thai = 'dang_o'")->fetchColumn();
 $demDaRoi = (int)$pdo->query("SELECT COUNT(*) FROM ktx_hoc_vien WHERE trang_thai = 'da_roi'")->fetchColumn();
+// So nguoi dang o theo gioi tinh (the "Nguoi hoc dang o")
+$demGioiTinh = ['Nam' => 0, 'Nữ' => 0, 'Khác' => 0];
+foreach ($pdo->query("SELECT gioi_tinh, COUNT(*) AS n FROM ktx_hoc_vien WHERE trang_thai = 'dang_o' GROUP BY gioi_tinh")->fetchAll() as $r) {
+    $g = isset($demGioiTinh[$r['gioi_tinh']]) ? $r['gioi_tinh'] : 'Khác';
+    $demGioiTinh[$g] += (int)$r['n'];
+}
 $demDaXep = (int)$pdo->query("SELECT COUNT(*) FROM ktx_hoc_vien WHERE trang_thai = 'dang_o' AND phong_id IS NOT NULL")->fetchColumn();
 $sucChua = 0; $soPhongSd = 0;
 foreach ($phongList as $p) { if (($p['tinh_trang'] ?? '') !== 'ngung_su_dung') { $sucChua += (int)$p['suc_chua']; $soPhongSd++; } }
@@ -314,6 +320,12 @@ require_once __DIR__ . '/../includes/header.php';
 .hs-kpi .num{font-size:28px;font-weight:700;line-height:1.05;color:var(--navy)}.hs-kpi .lb{color:var(--ink2)}
 .hs-kpi .sb{display:flex;border-top:1px solid var(--line2);padding-top:10px}
 .hs-kpi .sb div{flex:1;padding:0 8px;border-left:1px solid var(--line2)}.hs-kpi .sb div:first-child{border-left:0;padding-left:0}
+.hs-gt{display:flex;flex-direction:column;gap:6px}
+.hs-gt .lg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.hs-gt .lg a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:inherit}.hs-gt .lg a:hover{color:var(--pri)}
+.hs-gt .lg b{font-size:16px;color:var(--ink)}
+.hs-gt .bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line2)}
+.hs-gt .bar span{display:block;height:100%}
 .hs-kpi .sb b{display:block;font-size:18px}.hs-kpi .sb span{font-size:12.5px;color:var(--ink2)}
 .hs-wl{list-style:none;margin:0;padding:0;display:grid;gap:5px}
 .hs-wl a{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2);text-decoration:none}.hs-wl a:hover{color:var(--pri)}
@@ -603,6 +615,16 @@ table.hs-mini .r{text-align:right}
         <div class="hs-card hs-kpi">
           <div class="tp"><div class="ic" style="background:var(--pri-soft);color:var(--pri)"><svg class="i"><use href="#hi-users"/></svg></div>
             <div><div class="num"><?= $demDangO ?></div><div class="lb">Người học đang ở</div></div></div>
+          <div class="hs-gt">
+            <div class="lg">
+              <?php foreach ([['Nam', '#1f6fd6'], ['Nữ', '#d6457a'], ['Khác', '#98a4b5']] as [$g, $mau]): if ($g === 'Khác' && !$demGioiTinh[$g]) continue; ?>
+              <a href="<?= h($giuLoc(['gioi_tinh' => $g, 'trang_thai' => 'dang_o'], ['page', 'id', 'nhanh'])) ?>" title="Lọc người học <?= h($g) ?> đang ở"><span class="hs-dot" style="background:<?= $mau ?>"></span><?= h($g) ?> <b><?= $demGioiTinh[$g] ?></b><?= $demDangO ? ' <span class="hs-mut">(' . round($demGioiTinh[$g] / $demDangO * 100) . '%)</span>' : '' ?></a>
+              <?php endforeach; ?>
+            </div>
+            <div class="bar" aria-hidden="true">
+              <?php foreach ([['Nam', '#1f6fd6'], ['Nữ', '#d6457a'], ['Khác', '#98a4b5']] as [$g, $mau]): if ($demDangO && $demGioiTinh[$g]): ?><span style="width:<?= round($demGioiTinh[$g] / $demDangO * 100, 2) ?>%;background:<?= $mau ?>"></span><?php endif; endforeach; ?>
+            </div>
+          </div>
           <div class="sb">
             <div><b style="color:var(--green)"><?= $demVaoThangNay ?></b><span>Đăng ký T<?= $thangXem ?></span></div>
             <div><b style="color:var(--orange)"><?= $demRoiThangNay ?></b><span>Thanh lý T<?= $thangXem ?></span></div>
