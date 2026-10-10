@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hồ sơ nội trú KTX</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --navy:#0d3a78; --navy-2:#134b96; --primary:#1f6fd6; --primary-soft:#e7f0fc; --primary-line:#bcd3f3;
+  --bg:#eef3fa; --card:#ffffff; --line:#dfe7f2; --line-2:#edf2f8;
+  --ink:#1c2b41; --ink-2:#4b5d75; --ink-3:#8494aa;
+  --green:#1f9d55; --green-soft:#e3f6eb; --orange:#f08c00; --orange-soft:#fff3e0;
+  --red:#e03e3e; --red-soft:#fdeaea; --yellow:#f5b400; --violet:#6d4fd8;
+  --shadow:0 1px 2px rgba(16,42,84,.06),0 4px 14px rgba(16,42,84,.06);
+  --radius:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:14px;color:var(--ink);background:var(--bg)}
+button,input,select{font:inherit;color:inherit}
+svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Top bar ===== */
+.topbar{position:sticky;top:0;z-index:30;height:60px;display:flex;align-items:center;gap:18px;padding:0 18px;
+  background:linear-gradient(90deg,var(--navy),var(--navy-2));color:#fff;box-shadow:0 2px 8px rgba(13,58,120,.25)}
+.brand{display:flex;align-items:center;gap:10px;min-width:206px}
+.brand .logo{width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.85);display:grid;place-items:center}
+.brand .logo svg{width:20px;height:20px}
+.brand b{display:block;font-size:19px;letter-spacing:.3px;line-height:1.1}
+.brand small{display:block;font-size:10.5px;opacity:.8;letter-spacing:.4px;text-transform:uppercase}
+.gsearch{flex:1;max-width:440px;position:relative}
+.gsearch input{width:100%;height:34px;border:0;border-radius:6px;padding:0 38px 0 12px;background:#fff;color:var(--ink)}
+.gsearch svg{position:absolute;right:10px;top:8px;color:var(--ink-2)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.tb-btn{display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:0;border-radius:6px;background:transparent;color:#fff;cursor:pointer;white-space:nowrap}
+.tb-btn:hover{background:rgba(255,255,255,.12)}
+.tb-btn select{background:transparent;border:0;color:#fff;cursor:pointer;font-weight:600}
+.tb-btn select option{color:var(--ink)}
+.bell{position:relative}
+.bell .dot{position:absolute;top:2px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--red);font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+
+/* ===== Layout ===== */
+.shell{display:grid;grid-template-columns:212px 1fr;min-height:calc(100vh - 60px)}
+.side{background:#fff;border-right:1px solid var(--line);padding:12px 10px;position:sticky;top:60px;height:calc(100vh - 60px);overflow:auto}
+.side a{display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:4px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14.5px;cursor:pointer}
+.side a svg{width:20px;height:20px;color:var(--navy-2)}
+.side a:hover{background:var(--primary-soft)}
+.side a.active{background:var(--primary);color:#fff;box-shadow:0 2px 6px rgba(31,111,214,.35)}
+.side a.active svg{color:#fff}
+.side .sep{height:1px;background:var(--line);margin:10px 4px}
+.main{padding:14px 16px 24px;min-width:0}
+.view{display:none}.view.on{display:block}
+
+/* ===== Cards ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.kpis{display:grid;grid-template-columns:1fr 1fr 1fr 1.15fr;gap:12px;margin-bottom:12px}
+.kpi{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.kpi-top{display:flex;align-items:center;gap:14px}
+.kpi-ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:none}
+.kpi-ic svg{width:26px;height:26px}
+.kpi-num{font-size:28px;font-weight:700;line-height:1.05;color:var(--navy)}
+.kpi-lbl{color:var(--ink-2);font-size:14px}
+.kpi-sub{display:flex;border-top:1px solid var(--line-2);padding-top:10px}
+.kpi-sub div{flex:1;padding:0 8px;border-left:1px solid var(--line-2)}
+.kpi-sub div:first-child{border-left:0;padding-left:0}
+.kpi-sub b{display:block;font-size:18px}
+.kpi-sub span{font-size:12.5px;color:var(--ink-2)}
+.kpi-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.kpi-list li{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2);cursor:pointer}
+.kpi-list li:hover{color:var(--primary)}
+.kpi-list b{min-width:18px;text-align:right}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
+.warn-head{display:flex;align-items:center;gap:10px}
+.warn-head .badge{width:36px;height:36px;border-radius:8px;background:var(--red);color:#fff;display:grid;place-items:center}
+.warn-head h3{margin:0;font-size:17px}
+.warn-head a{margin-left:auto;font-size:12.5px;color:var(--primary);cursor:pointer}
+
+/* ===== Toolbar + table ===== */
+.listcard{margin-bottom:12px}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line)}
+.toolbar h2{margin:0 8px 0 2px;font-size:16px;color:var(--navy);letter-spacing:.2px;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);cursor:pointer;font-size:13px;white-space:nowrap}
+.btn svg{width:15px;height:15px}
+.btn:hover{border-color:var(--primary-line);background:#f7faff}
+.btn.pri{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.pri:hover{background:#185fbd}
+.btn.c-blue svg{color:var(--primary)} .btn.c-red svg{color:var(--red)} .btn.c-green svg{color:var(--green)} .btn.c-orange svg{color:var(--orange)} .btn.c-violet svg{color:var(--violet)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.tb-spacer{flex:1}
+.field{height:32px;border:1px solid var(--line);border-radius:7px;padding:0 10px;background:#fff;min-width:0}
+.qsearch{position:relative}
+.qsearch input{width:190px;padding-right:30px}
+.qsearch svg{position:absolute;right:9px;top:8px;width:15px;height:15px;color:var(--ink-3)}
+.filters{display:none;gap:8px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line);background:#f8fbff}
+.filters.on{display:flex}
+.filters label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2)}
+.dd{position:relative}
+.dd-menu{display:none;position:absolute;right:0;top:36px;z-index:20;width:340px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(16,42,84,.18);padding:6px}
+.dd.on .dd-menu{display:block}
+.dd-menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 10px;border-radius:7px;cursor:pointer}
+.dd-menu button:hover{background:var(--primary-soft)}
+.dd-menu b{display:block;font-size:13.5px}
+.dd-menu span{display:block;font-size:12px;color:var(--ink-2);margin-top:2px}
+.tablewrap{overflow:auto;max-height:340px}
+table.grid{width:100%;border-collapse:collapse;font-size:13.5px}
+table.grid th{position:sticky;top:0;z-index:1;background:#f1f5fb;color:var(--ink);font-weight:600;text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);border-right:1px solid var(--line-2);white-space:nowrap}
+table.grid td{padding:7px 10px;border-bottom:1px solid var(--line-2);border-right:1px solid var(--line-2);white-space:nowrap}
+table.grid tbody tr{cursor:pointer}
+table.grid tbody tr:nth-child(even){background:#fbfcfe}
+table.grid tbody tr:hover{background:#f2f7ff}
+table.grid tbody tr.sel{background:#d9e8fb}
+table.grid td.c,table.grid th.c{text-align:center}
+.st{display:inline-flex;align-items:center;gap:6px}
+.empty{padding:28px;text-align:center;color:var(--ink-3)}
+.tfoot{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-size:12.5px;color:var(--ink-2)}
+
+/* ===== Detail ===== */
+.detail{display:grid;grid-template-columns:178px 1fr;gap:12px}
+.dtabs{padding:6px}
+.dtabs button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:10px 10px;border-radius:8px;text-align:left;cursor:pointer;font-size:13.5px;color:var(--ink)}
+.dtabs button svg{width:17px;height:17px;color:var(--navy-2)}
+.dtabs button:hover{background:var(--primary-soft)}
+.dtabs button.on{background:var(--primary);color:#fff}
+.dtabs button.on svg{color:#fff}
+.dhead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
+.dhead h2{margin:0;font-size:17px;color:var(--navy)}
+.dhead .nm{font-size:18px;font-weight:700;color:var(--primary)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border-radius:999px;font-size:13px;font-weight:600}
+.pill.green{background:var(--green-soft);color:var(--green)}
+.pill.orange{background:var(--orange-soft);color:var(--orange)}
+.pill.red{background:var(--red-soft);color:var(--red)}
+.pill.gray{background:#eef1f5;color:var(--ink-2)}
+.dhead .acts{margin-left:auto;display:flex;gap:8px}
+.dbody{padding:12px}
+.dgrid{display:grid;grid-template-columns:132px 1fr 1fr 1fr;gap:12px}
+.photo{display:flex;flex-direction:column;gap:8px}
+.photo .ph{width:132px;height:160px;border-radius:8px;border:1px solid var(--line);background:linear-gradient(180deg,#e8eef7,#d6e1f0);display:grid;place-items:center;overflow:hidden;color:#8ea2bf}
+.photo .ph img{width:100%;height:100%;object-fit:cover}
+.photo .ph svg{width:64px;height:64px;stroke-width:1.4}
+.sub{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.sub-h{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid var(--line-2);font-weight:700;color:var(--navy);font-size:13.5px;letter-spacing:.2px;text-transform:uppercase}
+.sub-h .btn{height:26px;padding:0 9px;font-size:12px;text-transform:none;letter-spacing:0;font-weight:400}
+.kv{display:grid;grid-template-columns:118px 1fr;gap:7px 10px;padding:10px 12px;font-size:13.3px}
+.kv dt{color:var(--ink-2)} .kv dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+.files{list-style:none;margin:0;padding:6px 8px}
+.files li{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px dashed var(--line-2);font-size:13px}
+.files li:last-child{border-bottom:0}
+.files li svg{width:16px;height:16px;color:var(--red)}
+.files li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.files li small{color:var(--ink-3)}
+.files li.miss{color:var(--ink-3)} .files li.miss svg{color:var(--ink-3)}
+.drow2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+table.mini{width:100%;border-collapse:collapse;font-size:13px}
+table.mini th{background:#f1f5fb;text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);font-weight:600}
+table.mini td{padding:7px 9px;border-bottom:1px solid var(--line-2)}
+.ok{color:var(--green);font-weight:600} .no{color:var(--red);font-weight:600}
+.dplace{padding:30px;text-align:center;color:var(--ink-3)}
+
+/* ===== Room map ===== */
+.mapbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px;border-bottom:1px solid var(--line)}
+.mapbar h2{margin:0 8px 0 0;font-size:17px;color:var(--navy)}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--ink-2);margin-left:auto}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px;padding:12px}
+.room{border:1px solid var(--line);border-radius:10px;padding:10px}
+.room h4{margin:0 0 8px;display:flex;justify-content:space-between;font-size:14px}
+.room h4 small{font-weight:400;color:var(--ink-2)}
+.beds{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.bed{height:34px;border-radius:6px;display:grid;place-items:center;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid transparent}
+.bed.used{background:var(--primary-soft);color:var(--primary);border-color:var(--primary-line)}
+.bed.free{background:#f3f6fa;color:var(--ink-3);border:1px dashed #c9d4e3}
+
+/* ===== Modal / toast ===== */
+.modal{position:fixed;inset:0;background:rgba(15,30,55,.45);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:40px 16px;overflow:auto}
+.modal.on{display:flex}
+.mbox{width:min(820px,100%);background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.mbox header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+.mbox header h3{margin:0;color:var(--navy);font-size:17px}
+.mbox header button{border:0;background:none;font-size:22px;cursor:pointer;color:var(--ink-2)}
+.form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 14px;padding:16px 18px}
+.form label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--ink-2)}
+.form .field{width:100%;height:34px;color:var(--ink)}
+.form .span2{grid-column:span 2} .form .span3{grid-column:1/-1}
+.form h4{grid-column:1/-1;margin:6px 0 0;font-size:13px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--line-2);padding-bottom:6px}
+.mbox footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.toast{position:fixed;right:18px;bottom:18px;z-index:60;background:#13284a;color:#fff;padding:11px 16px;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transform:translateY(10px);transition:.2s;pointer-events:none;max-width:420px}
+.toast.on{opacity:1;transform:none}
+
+@media (max-width:1280px){.kpis{grid-template-columns:1fr 1fr}.dgrid{grid-template-columns:132px 1fr 1fr}.dgrid .sub.files-card{grid-column:2/-1}}
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}.side{position:static;height:auto;display:flex;overflow:auto;padding:8px}
+  .side a{flex:none;margin:0 4px 0 0}.side .sep{display:none}
+  .detail{grid-template-columns:1fr}.dtabs{display:flex;overflow:auto}.dtabs button{flex:none;width:auto}
+  .dgrid,.drow2{grid-template-columns:1fr}.gsearch{display:none}.brand{min-width:0}
+  .form{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){.brand small{display:none}.brand b{font-size:15px}.brand .logo{width:32px;height:32px}.topbar{gap:8px;padding:0 10px}.tb-btn{padding:0 6px}.kpis{grid-template-columns:1fr}.tb-right .hide-sm{display:none}.form{grid-template-columns:1fr}.form .span2{grid-column:auto}.main{padding:12px}}
+@media print{
+  .topbar,.side,.toolbar,.filters,.dtabs,.dhead .acts,.kpis,.tfoot{display:none!important}
+  .shell{display:block}.tablewrap{max-height:none}.card{box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- SVG icon sprite -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.9.1 4.8 1.9 5.4 5.3"/></symbol>
+  <symbol id="i-id" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.4"/><path d="M5.5 17c.6-2 2-3 3.5-3s2.9 1 3.5 3M14.5 9.5h4M14.5 13h4"/></symbol>
+  <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18V7M3 13h18v5M21 18v-3a3 3 0 0 0-3-3h-7v1"/><circle cx="7" cy="10.5" r="1.8"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8.5 12 2.3 2.3L15.5 9.6"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8.5 13h7M8.5 16.5h5"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.5-.9-1.6-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.8 5.8 1.4 5.8 4.2 0 1.3-1.3 2.1-3 2.1-1.3 0-2.5-.6-3-1.6M12 6v1.8M12 16.2V18"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6z"/><path d="M12 9v6M9 12h6"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20V12M10 20V8M15 20v-5M20 20V5"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-bellic" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.1-2.4 3.6M12 17h.01"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="1.5"/><path d="M7 14h10v7H7z"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4 1.5v-8z"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4.5M12 17.2h.01"/></symbol>
+  <symbol id="i-pdf" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4 21c.8-4.2 4-6.5 8-6.5s7.2 2.3 8 6.5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-cam" viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 24 24"><path d="M6 18v-5M10.5 18V9M15 18v-7M19.5 18V6"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo"><svg class="i"><use href="#i-bed"/></svg></div>
+    <div><b>KÝ TÚC XÁ</b><small>Quản lý hồ sơ nội trú</small></div>
+  </div>
+  <label class="gsearch">
+    <input id="gq" placeholder="Tìm người học (Mã số, họ tên, CCCD, SĐT, phòng…)">
+    <svg class="i"><use href="#i-search"/></svg>
+  </label>
+  <div class="tb-right">
+    <button class="tb-btn bell" title="Cảnh báo" onclick="go('ho-so');document.getElementById('warn').scrollIntoView({behavior:'smooth'})">
+      <svg class="i" style="width:22px;height:22px"><use href="#i-bellic"/></svg><span class="dot" id="bellN">0</span>
+    </button>
+    <span class="tb-btn">Năm <select id="selYear"></select></span>
+    <span class="tb-btn">Tháng <select id="selMonth"></select></span>
+    <button class="tb-btn hide-sm" onclick="toast('Cài đặt: kết nối với cấu hình hệ thống hiện có.')"><svg class="i"><use href="#i-gear"/></svg>Cài đặt</button>
+    <button class="tb-btn hide-sm" onclick="toast('Chọn 1 dòng để xem hồ sơ; dùng Bộ lọc để lọc theo dãy/trạng thái.')"><svg class="i"><use href="#i-help"/></svg>Trợ giúp</button>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="side" id="side">
+    <a data-v="ho-so" class="active"><svg class="i"><use href="#i-home"/></svg>Tổng quan</a>
+    <a data-v="ho-so" data-focus="list"><svg class="i"><use href="#i-id"/></svg>Hồ sơ nội trú</a>
+    <a data-v="so-do"><svg class="i"><use href="#i-bed"/></svg>Phòng – Giường</a>
+    <a data-v="placeholder" data-t="Điểm danh theo đợt"><svg class="i"><use href="#i-check"/></svg>Điểm danh theo đợt</a>
+    <a data-v="placeholder" data-t="Hợp đồng nội trú"><svg class="i"><use href="#i-file"/></svg>Hợp đồng nội trú</a>
+    <a data-v="placeholder" data-t="Phí KTX"><svg class="i"><use href="#i-coin"/></svg>Phí KTX</a>
+    <a data-v="placeholder" data-t="Ban Quản lý KTX"><svg class="i"><use href="#i-shield"/></svg>Ban Quản lý KTX</a>
+    <a data-v="placeholder" data-t="Cán sự / Đội SV"><svg class="i"><use href="#i-star"/></svg>Cán sự / Đội SV</a>
+    <a data-v="placeholder" data-t="Đối chiếu danh sách"><svg class="i"><use href="#i-swap"/></svg>Đối chiếu danh sách</a>
+    <a data-v="placeholder" data-t="Gửi thông báo email"><svg class="i"><use href="#i-mail"/></svg>Gửi thông báo email</a>
+    <div class="sep"></div>
+    <a data-v="ho-so" data-focus="export"><svg class="i"><use href="#i-chart"/></svg>Báo cáo</a>
+    <a data-v="placeholder" data-t="Hệ thống"><svg class="i"><use href="#i-gear"/></svg>Hệ thống</a>
+  </nav>
+
+  <main class="main">
+    <!-- ================= HỒ SƠ ================= -->
+    <section class="view on" id="v-ho-so">
+      <div class="kpis">
+        <div class="card kpi">
+          <div class="kpi-top">
+            <div class="kpi-ic" style="background:var(--primary-soft);color:var(--primary)"><svg class="i"><use href="#i-users"/></svg></div>
+            <div><div class="kpi-num" id="kTotal">0</div><div class="kpi-lbl">Người học trong hồ sơ</div></div>
+          </div>
+          <div class="kpi-sub">
+            <div><b id="kDangO" style="color:var(--green)">0</b><span>Đang ở</span></div>
+            <div><b id="kCho" style="color:var(--primary)">0</b><span>Chờ xếp phòng</span></div>
+            <div><b id="kRoi" style="color:var(--orange)">0</b><span>Đã rời KTX</span></div>
+          </div>
+        </div>
+        <div class="card kpi">
+          <div class="kpi-top">
+            <div class="kpi-ic" style="background:var(--green-soft);color:var(--green)"><svg class="i"><use href="#i-bed"/></svg></div>
+            <div><div class="kpi-num" id="kRate">0%</div><div class="kpi-lbl">Công suất giường</div></div>
+          </div>
+          <div class="kpi-sub">
+            <div><b id="kUsed">0</b><span>Giường đã ở</span></div>
+            <div><b id="kFree">0</b><span>Giường trống</span></div>
+          </div>
+        </div>
+        <div class="card kpi">
+          <div class="kpi-top">
+            <div class="kpi-ic" style="background:var(--orange-soft);color:var(--orange)"><svg class="i"><use href="#i-file"/></svg></div>
+            <div><div class="kpi-num" id="kExp" style="color:var(--red)">0</div><div class="kpi-lbl">HĐ nội trú sắp hết hạn</div></div>
+          </div>
+          <ul class="kpi-list">
+            <li data-flt="nophi"><span class="dot" style="background:var(--red)"></span><b id="kNoFee" style="color:var(--red)">0</b> Chưa đóng phí KTX tháng này</li>
+            <li data-flt="noanh"><span class="dot" style="background:var(--yellow)"></span><b id="kNoPhoto" style="color:var(--orange)">0</b> Chưa có ảnh thẻ</li>
+          </ul>
+        </div>
+        <div class="card kpi" id="warn">
+          <div class="warn-head">
+            <div class="badge"><svg class="i"><use href="#i-alert"/></svg></div>
+            <h3>Cảnh báo</h3>
+            <a onclick="setFlt('canhbao')">Xem tất cả</a>
+          </div>
+          <ul class="kpi-list" id="warnList"></ul>
+        </div>
+      </div>
+
+      <div class="card listcard" id="listcard">
+        <div class="toolbar">
+          <h2>DANH SÁCH NGƯỜI HỌC NỘI TRÚ</h2>
+          <button class="btn pri" onclick="openForm()"><svg class="i"><use href="#i-plus"/></svg>Thêm học viên</button>
+          <button class="btn c-blue" onclick="openForm(selId)" id="bEdit"><svg class="i"><use href="#i-edit"/></svg>Sửa</button>
+          <button class="btn c-red" onclick="delSel()" id="bDel"><svg class="i"><use href="#i-trash"/></svg>Xóa</button>
+          <label class="btn c-green" style="position:relative"><svg class="i"><use href="#i-up"/></svg>Import Excel
+            <input type="file" accept=".xlsx,.xls,.csv" style="position:absolute;inset:0;opacity:0;cursor:pointer" onchange="importExcel(this)"></label>
+          <div class="dd" id="ddExport">
+            <button class="btn c-orange" onclick="this.parentNode.classList.toggle('on')"><svg class="i"><use href="#i-down"/></svg>Xuất báo cáo ▾</button>
+            <div class="dd-menu">
+              <button onclick="exportQuarter()"><b>Danh sách người học ở nội trú theo quý</b><span>Mẫu sheet “Q_TỔNG HỢP KTX”: nhóm Dãy Nam – Dãy Nữ, dòng Tổng cộng, Nơi nhận và chữ ký. Quý tính theo Tháng/Năm trên thanh tiêu đề.</span></button>
+              <button onclick="exportFull(false)"><b>Hồ sơ tổng hợp (27 trường) — toàn bộ đang ở</b><span>Chỉ gồm người học đang ở thực tế.</span></button>
+              <button onclick="exportFull(true)"><b>Hồ sơ tổng hợp (27 trường) — theo bộ lọc hiện tại</b><span>Xuất đúng các dòng đang hiển thị.</span></button>
+              <button onclick="exportLeft()"><b>Người học đã thanh lý HĐ / huỷ đăng ký</b><span>Có cột “Lý do rời” phân biệt Thanh lý HĐ / Huỷ đăng ký.</span></button>
+            </div>
+          </div>
+          <button class="btn c-violet" onclick="window.print()"><svg class="i"><use href="#i-print"/></svg>In danh sách</button>
+          <span class="tb-spacer"></span>
+          <label class="qsearch"><input class="field" id="q" placeholder="Tìm theo tên hoặc mã số…"><svg class="i"><use href="#i-search"/></svg></label>
+        </div>
+        <div class="filters on" id="filters">
+          <span style="display:flex;align-items:center;gap:6px;font-weight:600;color:var(--navy)"><svg class="i" style="width:15px;height:15px"><use href="#i-filter"/></svg>Bộ lọc</span>
+          <label>Dãy <select class="field" id="fDay"><option value="">Tất cả các dãy</option></select></label>
+          <label>Trạng thái <select class="field" id="fSt">
+            <option value="Đang ở">Đang ở</option><option value="">Tất cả</option><option>Chờ xếp phòng</option><option>Đã thanh lý HĐ</option><option>Huỷ đăng ký</option>
+          </select></label>
+          <label>Giới tính <select class="field" id="fGt"><option value="">Tất cả</option><option>Nam</option><option>Nữ</option></select></label>
+          <label>Lọc nhanh <select class="field" id="fQuick">
+            <option value="">—</option><option value="canhbao">Có cảnh báo</option><option value="hethan">HĐ sắp hết hạn (≤ 30 ngày)</option><option value="nophi">Chưa đóng phí tháng này</option><option value="nocccd">Thiếu CCCD</option><option value="noanh">Chưa có ảnh thẻ</option>
+          </select></label>
+          <button class="btn" onclick="resetFilters()">Xoá lọc</button>
+        </div>
+        <div class="tablewrap">
+          <table class="grid">
+            <thead><tr>
+              <th class="c">STT</th><th>Mã số</th><th>Họ và tên</th><th class="c">GT</th><th>Ngày sinh</th><th>Lớp</th><th>Dãy</th><th class="c">Phòng</th><th class="c">Giường</th><th>SĐT</th><th>Ngày vào KTX</th><th>Trạng thái</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="tfoot"><span id="countInfo"></span><span>Nhấp một dòng để xem hồ sơ • Nhấp đúp để sửa</span></div>
+      </div>
+
+      <div class="detail" id="detail">
+        <div class="card dtabs" id="dtabs">
+          <button data-t="chung" class="on"><svg class="i"><use href="#i-home"/></svg>Thông tin chung</button>
+          <button data-t="canhan"><svg class="i"><use href="#i-user"/></svg>Hồ sơ cá nhân</button>
+          <button data-t="hopdong"><svg class="i"><use href="#i-file"/></svg>Hợp đồng nội trú</button>
+          <button data-t="phong"><svg class="i"><use href="#i-bed"/></svg>Phòng – Giường</button>
+          <button data-t="diemdanh"><svg class="i"><use href="#i-check"/></svg>Điểm danh</button>
+          <button data-t="phi"><svg class="i"><use href="#i-coin"/></svg>Phí KTX</button>
+          <button data-t="khenthuong"><svg class="i"><use href="#i-star"/></svg>Khen thưởng – Kỷ luật</button>
+          <button data-t="lichsu"><svg class="i"><use href="#i-clock"/></svg>Lịch sử thay đổi</button>
+        </div>
+        <div class="card" id="dpanel"></div>
+      </div>
+    </section>
+
+    <!-- ================= SƠ ĐỒ ================= -->
+    <section class="view" id="v-so-do">
+      <div class="card">
+        <div class="mapbar">
+          <h2>SƠ ĐỒ PHÒNG – GIƯỜNG</h2>
+          <select class="field" id="mapDay"></select>
+          <div class="legend"><span><i style="background:var(--primary-soft);border:1px solid var(--primary-line)"></i>Đã có người</span><span><i style="background:#f3f6fa;border:1px dashed #c9d4e3"></i>Giường trống</span></div>
+        </div>
+        <div class="rooms" id="rooms"></div>
+      </div>
+    </section>
+
+    <!-- ================= PLACEHOLDER ================= -->
+    <section class="view" id="v-placeholder">
+      <div class="card dplace"><h2 id="phTitle" style="color:var(--navy);margin:0 0 8px"></h2>
+        <p>Chức năng này giữ nguyên nghiệp vụ của trang cũ — gắn vào đây khi kết nối với máy chủ.</p>
+        <button class="btn pri" onclick="go('ho-so')">← Về Hồ sơ nội trú</button></div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ Modal thêm / sửa ============ -->
+<div class="modal" id="modal">
+  <div class="mbox">
+    <header><h3 id="mTitle">Thêm học viên</h3><button onclick="closeForm()">×</button></header>
+    <form class="form" id="frm" onsubmit="saveForm(event)">
+      <h4>Thông tin cá nhân</h4>
+      <label>Mã số SV *<input class="field" name="ma" required></label>
+      <label class="span2">Họ và tên *<input class="field" name="ten" required></label>
+      <label>Giới tính<select class="field" name="gt"><option>Nam</option><option>Nữ</option></select></label>
+      <label>Ngày sinh<input class="field" name="ns" placeholder="dd/mm/yyyy"></label>
+      <label>Lớp<input class="field" name="lop"></label>
+      <label>CCCD<input class="field" name="cccd"></label>
+      <label>Ngày cấp<input class="field" name="ngayCap" placeholder="dd/mm/yyyy"></label>
+      <label>Dân tộc<input class="field" name="danToc"></label>
+      <label>Số điện thoại<input class="field" name="sdt"></label>
+      <label class="span2">Email<input class="field" name="email" type="email"></label>
+      <label class="span3">Hộ khẩu thường trú<input class="field" name="que"></label>
+      <h4>Thông tin nội trú</h4>
+      <label>Dãy<select class="field" name="day"></select></label>
+      <label>Phòng<input class="field" name="phong" placeholder="A01"></label>
+      <label>Giường<input class="field" name="giuong" placeholder="A01.01"></label>
+      <label>Ngày vào KTX<input class="field" name="ngayVao" placeholder="dd/mm/yyyy"></label>
+      <label>Số HĐ nội trú<input class="field" name="hdSo"></label>
+      <label>HĐ hết hạn<input class="field" name="hdHet" placeholder="dd/mm/yyyy"></label>
+      <label>Trạng thái<select class="field" name="tt"><option>Đang ở</option><option>Chờ xếp phòng</option><option>Đã thanh lý HĐ</option><option>Huỷ đăng ký</option></select></label>
+      <label>Đóng phí tháng này<select class="field" name="phi"><option value="1">Đã đóng</option><option value="0">Chưa đóng</option></select></label>
+      <label>Đối tượng ưu tiên<input class="field" name="uuTien"></label>
+      <label class="span3">Lý do rời (nếu thanh lý / huỷ)<input class="field" name="lyDoRoi"></label>
+      <h4>Người liên hệ khẩn cấp</h4>
+      <label>Họ tên<input class="field" name="lhTen"></label>
+      <label>Quan hệ<input class="field" name="lhQh"></label>
+      <label>SĐT<input class="field" name="lhSdt"></label>
+    </form>
+    <footer><button class="btn" onclick="closeForm()">Huỷ</button><button class="btn pri" form="frm"><svg class="i"><use href="#i-save"/></svg>Lưu</button></footer>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DỮ LIỆU ================= */
+const KEY = 'ktx_hoso_v1';
+const DAYS = [
+  {id:'A', ten:'Dãy nhà A', gt:'Nam', rooms:8},
+  {id:'B', ten:'Dãy nhà B', gt:'Nam', rooms:6},
+  {id:'C', ten:'Dãy nhà C', gt:'Nữ',  rooms:8},
+  {id:'D', ten:'Dãy nhà D', gt:'Nữ',  rooms:6},
+];
+const BEDS = 6;
+const today = new Date();
+
+function seed(){
+  // Dữ liệu MẪU để chạy thử — thay bằng dữ liệu thật qua Import Excel hoặc API máy chủ.
+  const ho=['Nguyễn','Trần','Lê','Phạm','Hoàng','Huỳnh','Võ','Đặng','Bùi','Đỗ','Ngô','Dương','Lý'];
+  const demNam=['Văn','Minh','Quốc','Thành','Hữu','Gia','Đức'], demNu=['Thị','Ngọc','Thu','Kim','Bảo','Mỹ'];
+  const tenNam=['An','Khánh','Hạnh','Phúc','Tài','Long','Huy','Nam','Tín','Lộc','Duy','Khoa'];
+  const tenNu=['Anh','Vy','Trâm','Như','Linh','Hân','Thảo','Ngân','My','Uyên','Trinh','Yến'];
+  const lops=['Y-A K48','Y-B K48','XN K49','DH K49','RHM K50','DD K50','YHCT K49','YTCC K50'];
+  let r=7; const rnd=n=>{r=(r*9301+49297)%233280;return Math.floor(r/233280*n)};
+  const out=[]; let k=1;
+  DAYS.forEach(d=>{
+    for(let p=1;p<=d.rooms;p++){
+      const fill = Math.max(2, BEDS - rnd(4));
+      for(let g=1; g<=fill; g++){
+        const nam=d.gt==='Nam';
+        const ten=ho[rnd(ho.length)]+' '+(nam?demNam[rnd(7)]:demNu[rnd(6)])+' '+(nam?tenNam[rnd(12)]:tenNu[rnd(12)]);
+        const khoa=22+rnd(4);
+        const vao=new Date(today.getTime()-(35+rnd(300))*864e5);
+        const het=new Date(vao); het.setFullYear(het.getFullYear()+1);
+        if(rnd(14)===0){ het.setTime(today.getTime()+ (3+rnd(25))*864e5); }
+        const roiType = rnd(16);
+        const tt = roiType===0?'Đã thanh lý HĐ': roiType===1?'Huỷ đăng ký':'Đang ở';
+        out.push({
+          id:'s'+k, ma:khoa+'53'+String(10000+rnd(89999)).padStart(6,'0').slice(0,6),
+          ten, gt:d.gt, ns:fmt(new Date(2000+rnd(6),rnd(12),1+rnd(27))), lop:lops[rnd(lops.length)],
+          day:d.ten, phong:d.id+String(p).padStart(2,'0'), giuong:d.id+String(p).padStart(2,'0')+'.'+String(g).padStart(2,'0'),
+          sdt:'09'+String(10000000+rnd(89999999)), email:'sv'+k+'@student.example.vn',
+          cccd: rnd(10)===0?'':'0920'+String(10000000+rnd(89999999)), ngayCap:'15/06/2021', danToc:'Kinh',
+          que:['Cần Thơ','Vĩnh Long','An Giang','Sóc Trăng','Hậu Giang','Kiên Giang','Cà Mau'][rnd(7)],
+          ngayVao:fmt(vao), hdSo:String(k).padStart(4,'0')+'/HĐ-KTX', hdHet:fmt(het),
+          tt, phi: rnd(7)===0?'0':'1', anh: rnd(8)===0?'0':'1', uuTien: rnd(10)===0?'Con thương binh':'',
+          lyDoRoi: tt==='Đã thanh lý HĐ'?'Tốt nghiệp / hết nhu cầu': tt==='Huỷ đăng ký'?'Không nhận phòng':'',
+          lhTen:'PHHS của '+ten.split(' ').pop(), lhQh:['Cha','Mẹ','Anh','Chị'][rnd(4)], lhSdt:'09'+String(10000000+rnd(89999999)),
+          log:[{t:fmt(vao),n:'Tạo hồ sơ, xếp giường '+d.id+String(p).padStart(2,'0')+'.'+String(g).padStart(2,'0')}]
+        });
+        k++;
+      }
+    }
+  });
+  for(let i=0;i<4;i++){ const d=DAYS[i%4];
+    out.push({id:'s'+(k++),ma:'2553'+String(100000+rnd(899999)).slice(0,6),ten:ho[rnd(13)]+' '+(d.gt==='Nam'?'Văn Tâm':'Thị Mai'),gt:d.gt,ns:'02/03/2007',lop:'Y-A K51',day:d.ten,phong:'',giuong:'',sdt:'09'+String(10000000+rnd(89999999)),email:'',cccd:'',ngayCap:'',danToc:'Kinh',que:'Cần Thơ',ngayVao:'',hdSo:'',hdHet:'',tt:'Chờ xếp phòng',phi:'0',anh:'0',uuTien:'',lyDoRoi:'',lhTen:'',lhQh:'',lhSdt:'',log:[{t:fmt(today),n:'Đăng ký nội trú'}]});
+  }
+  return out;
+}
+let DB;
+try{ DB = JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){}
+if(!Array.isArray(DB)||!DB.length) DB = seed();
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){} }
+
+/* ================= TIỆN ÍCH ================= */
+function fmt(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+function parse(s){ const m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s||''); return m?new Date(+m[3],m[2]-1,+m[1]):null; }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function norm(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase(); }
+const $ = id=>document.getElementById(id);
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2800); }
+const isLeft = s=>s.tt==='Đã thanh lý HĐ'||s.tt==='Huỷ đăng ký';
+function daysLeft(s){ const d=parse(s.hdHet); return d? Math.ceil((d-today)/864e5) : null; }
+function flags(s){
+  if(isLeft(s)) return [];
+  const f=[]; const dl=daysLeft(s);
+  if(s.tt==='Đang ở' && dl!==null && dl<=30) f.push('hethan');
+  if(s.tt==='Đang ở' && s.phi!=='1') f.push('nophi');
+  if(!s.cccd) f.push('nocccd');
+  if(s.anh!=='1') f.push('noanh');
+  if(!s.lhSdt) f.push('nolh');
+  return f;
+}
+function stPill(tt){ return tt==='Đang ở'?'green': tt==='Chờ xếp phòng'?'orange': tt==='Huỷ đăng ký'?'red':'gray'; }
+function stDot(tt){ return {green:'var(--green)',orange:'var(--orange)',red:'var(--red)',gray:'#98a4b5'}[stPill(tt)]; }
+
+/* ================= HEADER SELECTORS ================= */
+(function(){
+  const y=$('selYear'), m=$('selMonth');
+  for(let i=today.getFullYear()-3;i<=today.getFullYear()+1;i++) y.add(new Option(i,i,false,i===today.getFullYear()));
+  for(let i=1;i<=12;i++) m.add(new Option(i,i,false,i===today.getMonth()+1));
+  DAYS.forEach(d=>{ $('fDay').add(new Option(d.ten+' ('+d.gt+')',d.ten)); $('mapDay').add(new Option(d.ten+' – '+d.gt,d.ten)); document.querySelector('#frm [name=day]').add(new Option(d.ten,d.ten)); });
+})();
+
+/* ================= LỌC & BẢNG ================= */
+let selId=null, quick='', dtab='chung';
+function filtered(){
+  const q=norm($('q').value.trim()||$('gq').value.trim()), day=$('fDay').value, st=$('fSt').value, gt=$('fGt').value; quick=$('fQuick').value;
+  return DB.filter(s=>{
+    if(day && s.day!==day) return false;
+    if(st && s.tt!==st) return false;
+    if(gt && s.gt!==gt) return false;
+    if(quick==='canhbao' && !flags(s).length) return false;
+    if(quick && quick!=='canhbao' && !flags(s).includes(quick)) return false;
+    if(q){ const hay=norm([s.ma,s.ten,s.cccd,s.sdt,s.phong,s.giuong,s.lop].join(' ')); if(!hay.includes(q)) return false; }
+    return true;
+  }).sort((a,b)=>(a.giuong||'zz').localeCompare(b.giuong||'zz')||a.ten.localeCompare(b.ten,'vi'));
+}
+function renderTable(){
+  const rows=filtered();
+  if(selId && !rows.some(r=>r.id===selId)) selId = rows[0]?.id || null;
+  if(!selId && rows[0]) selId=rows[0].id;
+  $('tbody').innerHTML = rows.length ? rows.map((s,i)=>`
+    <tr data-id="${s.id}" class="${s.id===selId?'sel':''}">
+      <td class="c">${i+1}</td><td>${esc(s.ma)}</td><td>${esc(s.ten)}</td><td class="c">${esc(s.gt)}</td><td>${esc(s.ns)}</td>
+      <td>${esc(s.lop)}</td><td>${esc(s.day)}</td><td class="c">${esc(s.phong||'—')}</td><td class="c">${esc(s.giuong||'—')}</td>
+      <td>${esc(s.sdt)}</td><td>${esc(s.ngayVao||'—')}</td>
+      <td><span class="st"><span class="dot" style="background:${stDot(s.tt)}"></span>${esc(s.tt)}</span>${flags(s).length?` <span title="Có cảnh báo" style="color:var(--red)">●</span>`:''}</td>
+    </tr>`).join('') : `<tr><td colspan="12" class="empty">Không có người học phù hợp bộ lọc.</td></tr>`;
+  $('countInfo').textContent = `Hiển thị ${rows.length} / ${DB.length} hồ sơ`;
+  $('bEdit').disabled=$('bDel').disabled=!selId;
+  renderDetail();
+}
+$('tbody').addEventListener('click',e=>{ const tr=e.target.closest('tr[data-id]'); if(!tr) return; selId=tr.dataset.id; document.querySelectorAll('#tbody tr').forEach(r=>r.classList.toggle('sel',r===tr)); $('bEdit').disabled=$('bDel').disabled=false; renderDetail(); });
+$('tbody').addEventListener('dblclick',e=>{ const tr=e.target.closest('tr[data-id]'); if(tr) openForm(tr.dataset.id); });
+['q','gq'].forEach(id=>$(id).addEventListener('input',renderTable));
+['fDay','fSt','fGt','fQuick'].forEach(id=>$(id).addEventListener('change',renderTable));
+function resetFilters(){ $('q').value=$('gq').value=''; $('fDay').value=''; $('fSt').value='Đang ở'; $('fGt').value=''; $('fQuick').value=''; renderTable(); }
+function setFlt(f){ $('fQuick').value=f; $('fSt').value=''; $('filters').classList.add('on'); renderTable(); $('listcard').scrollIntoView({behavior:'smooth'}); }
+
+/* ================= KPI ================= */
+function renderKpi(){
+  const dang=DB.filter(s=>s.tt==='Đang ở');
+  const cap=DAYS.reduce((a,d)=>a+d.rooms*BEDS,0);
+  $('kTotal').textContent=DB.length;
+  $('kDangO').textContent=dang.length;
+  $('kCho').textContent=DB.filter(s=>s.tt==='Chờ xếp phòng').length;
+  $('kRoi').textContent=DB.filter(isLeft).length;
+  $('kUsed').textContent=dang.length; $('kFree').textContent=cap-dang.length;
+  $('kRate').textContent=Math.round(dang.length/cap*100)+'%';
+  const c=f=>DB.filter(s=>flags(s).includes(f)).length;
+  $('kExp').textContent=c('hethan'); $('kNoFee').textContent=c('nophi'); $('kNoPhoto').textContent=c('noanh');
+  const W=[['hethan','var(--red)','HĐ nội trú hết hạn trong 30 ngày'],['nophi','var(--red)','Chưa đóng phí KTX tháng này'],['nocccd','var(--orange)','Hồ sơ thiếu CCCD'],['noanh','var(--yellow)','Chưa có ảnh thẻ'],['nolh','var(--yellow)','Chưa có người liên hệ khẩn cấp']];
+  $('warnList').innerHTML=W.map(([f,c2,l])=>`<li data-flt="${f}"><span class="dot" style="background:${c2}"></span><b style="color:${c2}">${c(f)}</b>${l}</li>`).join('');
+  $('bellN').textContent=DB.filter(s=>flags(s).length).length;
+}
+document.addEventListener('click',e=>{
+  const li=e.target.closest('[data-flt]'); if(li) setFlt(li.dataset.flt);
+  if(!e.target.closest('#ddExport')) $('ddExport').classList.remove('on');
+});
+
+/* ================= CHI TIẾT HỒ SƠ ================= */
+$('dtabs').addEventListener('click',e=>{ const b=e.target.closest('button[data-t]'); if(!b) return; dtab=b.dataset.t; document.querySelectorAll('#dtabs button').forEach(x=>x.classList.toggle('on',x===b)); renderDetail(); });
+function kv(pairs){ return `<dl class="kv">${pairs.map(([k,v])=>`<dt>${k}</dt><dd>${v===''||v==null?'<span style="color:var(--ink-3)">—</span>':esc(v)}</dd>`).join('')}</dl>`; }
+function renderDetail(){
+  const s=DB.find(x=>x.id===selId), P=$('dpanel');
+  if(!s){ P.innerHTML='<div class="dplace">Chọn một người học trong danh sách để xem hồ sơ.</div>'; return; }
+  const dl=daysLeft(s);
+  const files=[['CCCD (2 mặt).pdf',!!s.cccd],['Đơn đăng ký nội trú.pdf',true],['HĐ nội trú '+(s.hdSo||'').replace('/','-')+'.pdf',!!s.hdSo],['Ảnh thẻ 3x4.jpg',s.anh==='1'],['Giấy xác nhận ưu tiên.pdf',!!s.uuTien],['Biên bản bàn giao tài sản.pdf',s.tt==='Đang ở']];
+  const head=`<div class="dhead">
+      <h2>HỒ SƠ NỘI TRÚ – ${esc(s.ma)}</h2><span class="nm">${esc(s.ten)}</span>
+      <span class="pill ${stPill(s.tt)}">${esc(s.tt)}</span>
+      <div class="acts">
+        <button class="btn pri" onclick="openForm('${s.id}')"><svg class="i"><use href="#i-edit"/></svg>Sửa hồ sơ</button>
+        <button class="btn" onclick="printOne('${s.id}')"><svg class="i"><use href="#i-print"/></svg>In hồ sơ</button>
+        <button class="btn" title="Thanh lý hợp đồng" onclick="terminate('${s.id}')"><svg class="i"><use href="#i-dots"/></svg></button>
+      </div></div>`;
+  let body='';
+  if(dtab==='chung'){
+    body=`<div class="dgrid">
+      <div class="photo"><div class="ph">${s.anh==='1'?`<svg class="i" style="color:#5c7aa6"><use href="#i-user"/></svg>`:`<svg class="i"><use href="#i-user"/></svg>`}</div>
+        <button class="btn" onclick="toast('Thay ảnh: tải ảnh 3x4 lên máy chủ.')"><svg class="i"><use href="#i-cam"/></svg>Thay ảnh</button></div>
+      <div class="sub"><div class="sub-h">Thông tin cá nhân<button class="btn" onclick="openForm('${s.id}')"><svg class="i"><use href="#i-edit"/></svg>Sửa</button></div>
+        ${kv([['Mã số SV',s.ma],['Họ và tên',s.ten],['Giới tính',s.gt],['Ngày sinh',s.ns],['Lớp',s.lop],['CCCD',s.cccd],['Ngày cấp',s.ngayCap],['Số điện thoại',s.sdt],['Email',s.email],['Thường trú',s.que]])}</div>
+      <div class="sub"><div class="sub-h">Thông tin nội trú<button class="btn" onclick="openForm('${s.id}')"><svg class="i"><use href="#i-edit"/></svg>Sửa</button></div>
+        ${kv([['Dãy',s.day],['Phòng',s.phong],['Giường',s.giuong],['Ngày vào KTX',s.ngayVao],['Số HĐ',s.hdSo],['HĐ hết hạn',s.hdHet+(dl!==null&&dl<=30&&!isLeft(s)?`  (còn ${dl} ngày)`:'')],['Phí tháng này',s.tt==='Đang ở'?(s.phi==='1'?'Đã đóng':'Chưa đóng'):''],['Ưu tiên',s.uuTien],['Lý do rời',s.lyDoRoi]])}</div>
+      <div class="sub files-card"><div class="sub-h">Hồ sơ đính kèm<button class="btn" onclick="toast('Thêm file: tải lên máy chủ.')"><svg class="i"><use href="#i-plus"/></svg>Thêm file</button></div>
+        <ul class="files">${files.map(([n,ok])=>`<li class="${ok?'':'miss'}"><svg class="i"><use href="#i-pdf"/></svg><span>${esc(n)}</span><small>${ok?'Đã nộp':'Thiếu'}</small></li>`).join('')}</ul></div>
+    </div>
+    <div class="drow2">
+      <div class="sub"><div class="sub-h">Người liên hệ khẩn cấp<button class="btn" onclick="openForm('${s.id}')"><svg class="i"><use href="#i-plus"/></svg>Thêm</button></div>
+        <table class="mini"><thead><tr><th>STT</th><th>Họ và tên</th><th>Quan hệ</th><th>SĐT</th><th>Trạng thái</th></tr></thead>
+        <tbody>${s.lhTen||s.lhSdt?`<tr><td>1</td><td>${esc(s.lhTen)}</td><td>${esc(s.lhQh)}</td><td>${esc(s.lhSdt)}</td><td class="${s.lhSdt?'ok':'no'}">${s.lhSdt?'✓ Đủ thông tin':'Thiếu SĐT'}</td></tr>`:`<tr><td colspan="5" class="no">Chưa có người liên hệ</td></tr>`}</tbody></table></div>
+      <div class="sub"><div class="sub-h">Hợp đồng – Quyết định</div>
+        <table class="mini"><thead><tr><th>STT</th><th>Loại văn bản</th><th>Số văn bản</th><th>Ngày hiệu lực</th><th>Hết hạn</th></tr></thead>
+        <tbody>${s.hdSo?`<tr><td>1</td><td>HĐ nội trú</td><td>${esc(s.hdSo)}</td><td>${esc(s.ngayVao)}</td><td>${esc(s.hdHet)}</td></tr>`:''}
+        ${isLeft(s)?`<tr><td>2</td><td>${esc(s.tt==='Huỷ đăng ký'?'Huỷ đăng ký':'Thanh lý HĐ')}</td><td>—</td><td colspan="2">${esc(s.lyDoRoi)}</td></tr>`:''}
+        ${!s.hdSo&&!isLeft(s)?'<tr><td colspan="5" style="color:var(--ink-3)">Chưa có hợp đồng</td></tr>':''}</tbody></table></div>
+    </div>`;
+  } else if(dtab==='canhan'){
+    body=`<div class="sub">${kv([['Mã số SV',s.ma],['Họ và tên',s.ten],['Giới tính',s.gt],['Ngày sinh',s.ns],['Dân tộc',s.danToc],['CCCD',s.cccd],['Ngày cấp',s.ngayCap],['Lớp',s.lop],['Số điện thoại',s.sdt],['Email',s.email],['Thường trú',s.que],['Đối tượng ưu tiên',s.uuTien]])}</div>`;
+  } else if(dtab==='hopdong'){
+    body=`<div class="sub">${kv([['Số HĐ',s.hdSo],['Ngày hiệu lực',s.ngayVao],['Ngày hết hạn',s.hdHet],['Còn lại',dl===null?'':dl+' ngày'],['Trạng thái',s.tt],['Lý do rời',s.lyDoRoi]])}</div>
+      ${!isLeft(s)?`<div style="margin-top:10px;display:flex;gap:8px"><button class="btn" onclick="terminate('${s.id}')">Thanh lý hợp đồng</button><button class="btn" onclick="extend('${s.id}')">Gia hạn 12 tháng</button></div>`:''}`;
+  } else if(dtab==='phong'){
+    const mates=DB.filter(x=>x.phong&&x.phong===s.phong&&x.tt==='Đang ở');
+    body=`<div class="sub">${kv([['Dãy',s.day],['Phòng',s.phong],['Giường',s.giuong],['Số người trong phòng',s.phong?mates.length+' / '+BEDS:'']])}</div>
+      ${s.phong?`<div class="sub" style="margin-top:12px"><div class="sub-h">Bạn cùng phòng</div><table class="mini"><thead><tr><th>Giường</th><th>Họ và tên</th><th>Lớp</th><th>SĐT</th></tr></thead><tbody>${mates.map(m=>`<tr><td>${esc(m.giuong)}</td><td>${esc(m.ten)}</td><td>${esc(m.lop)}</td><td>${esc(m.sdt)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
+  } else if(dtab==='phi'){
+    body=`<div class="sub">${kv([['Tháng '+$('selMonth').value+'/'+$('selYear').value,s.tt==='Đang ở'?(s.phi==='1'?'Đã đóng':'Chưa đóng'):'Không áp dụng']])}</div>
+      ${s.tt==='Đang ở'?`<div style="margin-top:10px"><button class="btn" onclick="togglePhi('${s.id}')">${s.phi==='1'?'Đánh dấu chưa đóng':'Xác nhận đã đóng phí'}</button></div>`:''}`;
+  } else if(dtab==='lichsu'){
+    body=`<div class="sub"><table class="mini"><thead><tr><th>Thời điểm</th><th>Nội dung</th></tr></thead><tbody>${(s.log||[]).slice().reverse().map(l=>`<tr><td>${esc(l.t)}</td><td>${esc(l.n)}</td></tr>`).join('')}</tbody></table></div>`;
+  } else {
+    body=`<div class="dplace">Mục “${esc(document.querySelector('#dtabs button.on').textContent.trim())}” lấy dữ liệu từ máy chủ — gắn vào khi kết nối.</div>`;
+  }
+  P.innerHTML=head+`<div class="dbody">${body}</div>`;
+}
+function addLog(s,n){ (s.log=s.log||[]).push({t:fmt(new Date()),n}); }
+function terminate(id){
+  const s=DB.find(x=>x.id===id); if(!s||isLeft(s)) return;
+  const kind=confirm('OK = Thanh lý HĐ   •   Huỷ = Huỷ đăng ký')?'Đã thanh lý HĐ':'Huỷ đăng ký';
+  const why=prompt('Lý do rời KTX:', kind==='Đã thanh lý HĐ'?'Hết nhu cầu ở':'Không nhận phòng'); if(why===null) return;
+  s.tt=kind; s.lyDoRoi=why; addLog(s,kind+' – '+why+' (giải phóng giường '+(s.giuong||'—')+')'); s.giuong=''; s.phong='';
+  persist(); refresh(); toast(kind+': '+s.ten);
+}
+function extend(id){ const s=DB.find(x=>x.id===id); const d=parse(s.hdHet)||new Date(); d.setFullYear(d.getFullYear()+1); s.hdHet=fmt(d); addLog(s,'Gia hạn HĐ đến '+s.hdHet); persist(); refresh(); toast('Đã gia hạn đến '+s.hdHet); }
+function togglePhi(id){ const s=DB.find(x=>x.id===id); s.phi=s.phi==='1'?'0':'1'; addLog(s,s.phi==='1'?'Xác nhận đóng phí':'Huỷ xác nhận phí'); persist(); refresh(); }
+
+/* ================= THÊM / SỬA / XOÁ ================= */
+let editId=null;
+function openForm(id){
+  editId=id||null; const f=$('frm'); f.reset();
+  $('mTitle').textContent=id?'Sửa hồ sơ nội trú':'Thêm học viên';
+  if(id){ const s=DB.find(x=>x.id===id); if(!s) return; [...f.elements].forEach(el=>{ if(el.name && s[el.name]!==undefined) el.value=s[el.name]; }); }
+  else { f.ngayVao.value=fmt(today); f.tt.value='Chờ xếp phòng'; f.phi.value='0'; }
+  $('modal').classList.add('on'); f.ma.focus();
+}
+function closeForm(){ $('modal').classList.remove('on'); }
+function saveForm(e){
+  e.preventDefault(); const f=$('frm'); const data={};
+  [...f.elements].forEach(el=>{ if(el.name) data[el.name]=el.value.trim(); });
+  if(DB.some(s=>s.ma===data.ma && s.id!==editId)) return toast('Mã số '+data.ma+' đã tồn tại.');
+  if(data.giuong && data.tt==='Đang ở'){ const o=DB.find(s=>s.giuong===data.giuong && s.tt==='Đang ở' && s.id!==editId); if(o) return toast('Giường '+data.giuong+' đang có '+o.ten+'.'); }
+  if(editId){ const s=DB.find(x=>x.id===editId); Object.assign(s,data); addLog(s,'Cập nhật hồ sơ'); toast('Đã lưu hồ sơ '+s.ten); }
+  else { const s={id:'s'+Date.now(),anh:'0',log:[],...data}; addLog(s,'Tạo hồ sơ'); DB.push(s); selId=s.id; toast('Đã thêm '+s.ten); }
+  persist(); closeForm(); refresh();
+}
+function delSel(){
+  const s=DB.find(x=>x.id===selId); if(!s) return;
+  if(!confirm('Xoá hẳn hồ sơ của '+s.ten+' ('+s.ma+')?\nNếu người học rời KTX, nên dùng "Thanh lý HĐ" thay vì xoá.')) return;
+  DB=DB.filter(x=>x.id!==selId); selId=null; persist(); refresh(); toast('Đã xoá hồ sơ.');
+}
+$('modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeForm(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeForm(); });
+
+/* ================= SƠ ĐỒ ================= */
+function renderMap(){
+  const d=DAYS.find(x=>x.ten===$('mapDay').value)||DAYS[0]; let h='';
+  for(let p=1;p<=d.rooms;p++){
+    const ph=d.id+String(p).padStart(2,'0'); let used=0, beds='';
+    for(let g=1;g<=BEDS;g++){
+      const gi=ph+'.'+String(g).padStart(2,'0'); const s=DB.find(x=>x.giuong===gi&&x.tt==='Đang ở');
+      if(s) used++;
+      beds+= s?`<div class="bed used" title="${esc(s.ten)} – ${esc(s.ma)}" data-sid="${s.id}">${gi.slice(-2)}</div>`:`<div class="bed free" title="Giường trống ${gi}">${gi.slice(-2)}</div>`;
+    }
+    h+=`<div class="room"><h4>${ph}<small>${used}/${BEDS} • ${d.gt}</small></h4><div class="beds">${beds}</div></div>`;
+  }
+  $('rooms').innerHTML=h;
+}
+$('mapDay').addEventListener('change',renderMap);
+$('rooms').addEventListener('click',e=>{ const b=e.target.closest('[data-sid]'); if(!b) return; selId=b.dataset.sid; $('fSt').value=''; go('ho-so'); renderTable(); $('detail').scrollIntoView({behavior:'smooth'}); });
+
+/* ================= ĐIỀU HƯỚNG ================= */
+function go(v,el){
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+  document.querySelectorAll('#side a').forEach(a=>a.classList.toggle('active', el? a===el : a.dataset.v===v && !a.dataset.focus));
+  if(v==='so-do') renderMap();
+}
+$('side').addEventListener('click',e=>{
+  const a=e.target.closest('a[data-v]'); if(!a) return;
+  if(a.dataset.v==='placeholder') $('phTitle').textContent=a.dataset.t;
+  go(a.dataset.v,a);
+  if(a.dataset.focus==='list') $('listcard').scrollIntoView({behavior:'smooth'});
+  if(a.dataset.focus==='export'){ $('listcard').scrollIntoView({behavior:'smooth'}); setTimeout(()=>$('ddExport').classList.add('on'),300); }
+});
+function refresh(){ renderKpi(); renderTable(); if($('v-so-do').classList.contains('on')) renderMap(); }
+$('selMonth').addEventListener('change',renderDetail); $('selYear').addEventListener('change',renderDetail);
+
+/* ================= XUẤT EXCEL ================= */
+function needXLSX(){ if(window.XLSX) return true; toast('Chưa tải được thư viện Excel — kiểm tra kết nối mạng.'); return false; }
+function save(wb,name){ XLSX.writeFile(wb,name); toast('Đã xuất '+name); $('ddExport').classList.remove('on'); }
+function exportQuarter(){
+  if(!needXLSX()) return;
+  const y=+$('selYear').value, q=Math.ceil(+$('selMonth').value/3), qEnd=new Date(y,q*3,0);
+  const living=DB.filter(s=>{ if(s.tt!=='Đang ở'||!s.giuong) return false; const v=parse(s.ngayVao); return !v||v<=qEnd; });
+  const A=[[`DANH SÁCH NGƯỜI HỌC Ở NỘI TRÚ KÝ TÚC XÁ – QUÝ ${q}/${y}`],[],['STT','Mã phòng','Số người ở','Số giường trống','Mã số SV','Họ và tên','Ngày vào KTX']];
+  let stt=0, tot=0, totFree=0;
+  ['Nam','Nữ'].forEach(gt=>{
+    A.push([`DÃY ${gt.toUpperCase()}`]);
+    DAYS.filter(d=>d.gt===gt).forEach(d=>{
+      for(let p=1;p<=d.rooms;p++){
+        const ph=d.id+String(p).padStart(2,'0'); const ppl=living.filter(s=>s.phong===ph).sort((a,b)=>a.giuong.localeCompare(b.giuong));
+        totFree+=BEDS-ppl.length;
+        ppl.forEach((s,i)=>{ stt++; tot++; A.push([stt, i?'':ph, i?'':ppl.length, i?'':BEDS-ppl.length, s.ma, s.ten, s.ngayVao]); });
+      }
+    });
+  });
+  A.push(['Tổng cộng','',tot,totFree]);
+  A.push([],['Nơi nhận:','','','','','NGƯỜI LẬP BIỂU'],['- Như trên;','','','','','(Ký, ghi rõ họ tên)'],['- Lưu: KTX.']);
+  const ws=XLSX.utils.aoa_to_sheet(A); ws['!cols']=[{wch:7},{wch:11},{wch:11},{wch:14},{wch:14},{wch:28},{wch:14}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:6}}];
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,`Q${q}_TỔNG HỢP KTX`);
+  save(wb,`DS_noi_tru_Q${q}_${y}.xlsx`);
+}
+const F27=[['STT',null],['Mã số SV','ma'],['Họ và tên','ten'],['Giới tính','gt'],['Ngày sinh','ns'],['Dân tộc','danToc'],['CCCD','cccd'],['Ngày cấp CCCD','ngayCap'],['Lớp','lop'],['Số điện thoại','sdt'],['Email','email'],['Thường trú','que'],['Dãy','day'],['Phòng','phong'],['Giường','giuong'],['Ngày vào KTX','ngayVao'],['Số HĐ nội trú','hdSo'],['HĐ hết hạn','hdHet'],['Trạng thái','tt'],['Phí tháng này',s=>s.phi==='1'?'Đã đóng':'Chưa đóng'],['Ảnh thẻ',s=>s.anh==='1'?'Có':'Chưa'],['Đối tượng ưu tiên','uuTien'],['Người liên hệ','lhTen'],['Quan hệ','lhQh'],['SĐT liên hệ','lhSdt'],['Cảnh báo',s=>flags(s).length?flags(s).length+' mục':''],['Ghi chú','lyDoRoi']];
+function rowsOf(list,fields){ return list.map((s,i)=>Object.fromEntries(fields.map(([h,k])=>[h, k===null?i+1: typeof k==='function'?k(s):(s[k]||'')]))); }
+function exportFull(useFilter){
+  if(!needXLSX()) return;
+  const list=useFilter?filtered():DB.filter(s=>s.tt==='Đang ở');
+  const ws=XLSX.utils.json_to_sheet(rowsOf(list,F27)); ws['!cols']=F27.map(([h])=>({wch:Math.max(10,h.length+2)}));
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'HỒ SƠ TỔNG HỢP');
+  save(wb, useFilter?'Ho_so_tong_hop_theo_loc.xlsx':'Ho_so_tong_hop_dang_o.xlsx');
+}
+function exportLeft(){
+  if(!needXLSX()) return;
+  const flds=[['STT',null],['Mã số SV','ma'],['Họ và tên','ten'],['Giới tính','gt'],['Ngày sinh','ns'],['Lớp','lop'],['Dãy','day'],['Ngày vào KTX','ngayVao'],['Số HĐ','hdSo'],['Hình thức rời',s=>s.tt==='Huỷ đăng ký'?'Huỷ đăng ký':'Thanh lý HĐ'],['Lý do rời','lyDoRoi'],['SĐT','sdt']];
+  const ws=XLSX.utils.json_to_sheet(rowsOf(DB.filter(isLeft),flds));
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'ĐÃ RỜI KTX'); save(wb,'DS_da_thanh_ly_huy_dang_ky.xlsx');
+}
+function importExcel(inp){
+  const file=inp.files[0]; if(!file||!needXLSX()) return;
+  const rd=new FileReader();
+  rd.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'}); const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{raw:false,defval:''});
+      const map=Object.fromEntries(F27.filter(([,k])=>typeof k==='string').map(([h,k])=>[norm(h),k]));
+      Object.assign(map,{[norm('Mã số')]:'ma',[norm('GT')]:'gt',[norm('SĐT')]:'sdt'});
+      let add=0,upd=0;
+      rows.forEach(r=>{
+        const o={}; Object.entries(r).forEach(([h,v])=>{ const k=map[norm(h).trim()]; if(k) o[k]=String(v).trim(); });
+        if(!o.ma||!o.ten) return;
+        const ex=DB.find(s=>s.ma===o.ma);
+        if(ex){ Object.assign(ex,o); addLog(ex,'Cập nhật từ Excel'); upd++; }
+        else { DB.push({id:'s'+Date.now()+add,tt:'Đang ở',phi:'1',anh:'0',log:[{t:fmt(new Date()),n:'Nhập từ Excel'}],...o}); add++; }
+      });
+      persist(); refresh(); toast(`Import xong: thêm ${add}, cập nhật ${upd} hồ sơ.`);
+    }catch(err){ toast('Không đọc được file Excel — kiểm tra lại định dạng.'); }
+    inp.value='';
+  };
+  rd.readAsArrayBuffer(file);
+}
+function printOne(id){
+  const prev=selId; selId=id; dtab='chung';
+  document.querySelectorAll('#dtabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='chung')); renderDetail();
+  document.body.classList.add('print-one'); window.print(); document.body.classList.remove('print-one'); selId=prev;
+}
+
+refresh();
+</script>
+<style>
+@media print{ body.print-one #listcard{display:none!important} }
+</style>
+</body>
+</html>
