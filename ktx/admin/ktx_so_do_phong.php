@@ -21,76 +21,17 @@ $loaiPhongList = $pdo->query('SELECT DISTINCT suc_chua FROM ktx_phong WHERE suc_
 $dayGioiTinh = [];
 foreach ($dayList as $d) { $dayGioiTinh[(int)$d['id']] = ['ten' => $d['ten'], 'gt' => in_array($d['gioi_tinh'], ['Nam', 'Nữ'], true) ? $d['gioi_tinh'] : 'Khác']; }
 
-$MENU = [
-    ['ktx_hoc_vien.php', 'Hồ sơ nội trú', 'id', false],
-    ['ktx_so_do_phong.php', 'Sơ đồ Phòng – Giường', 'bed', true],
-    ['ktx_diem_danh.php', 'Điểm danh theo đợt', 'check', false],
-    ['ktx_phi_noi_tru.php', 'Thu phí nội trú', 'coin', false],
-    ['ktx_dien_nuoc.php', 'Điện, nước', 'bolt', false],
-    ['ktx_luu_tru_tam_tru.php', 'Khai báo lưu trú / tạm trú', 'pin', false],
-    ['ktx_ban_quan_ly.php', 'Ban Quản lý KTX', 'shield', false],
-    ['ktx_doi_sv.php', 'Cán sự / Đội SV', 'star', false],
-    ['ktx_doi_chieu_ds.php', 'Đối chiếu danh sách', 'swap', false],
-    ['ktx_thong_bao_email.php', 'Gửi thông báo email', 'mail', false],
-];
 
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/ktx_khung.php';
 ?>
+<?php ktx_khung_css(); ?>
 <style>
 /* ===== So do Phong – Giuong (2026-10-10). Moi lop co tien to hs- (dung chung voi ktx_hoc_vien.php) hoac sd- ===== */
-.hs,.sd-dr{--navy:#0d3a78;--navy2:#134b96;--pri:#1f6fd6;--pri-soft:#e7f0fc;--pri-line:#bcd3f3;--bg:#eef3fa;--line:#dfe7f2;--line2:#edf2f8;
-  --ink:#1c2b41;--ink2:#4b5d75;--ink3:#8494aa;--green:#1f9d55;--green-soft:#e3f6eb;--orange:#f08c00;--orange-soft:#fff3e0;--red:#e03e3e;--red-soft:#fdeaea;--yellow:#f5b400;
-  --nam:#1f6fd6;--nu:#d6457a;--shadow:0 1px 2px rgba(16,42,84,.06),0 4px 14px rgba(16,42,84,.06);
-}
-.hs{max-width:1900px;margin:0 auto;padding:12px 14px 24px;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;border-radius:14px}
-.hs *{box-sizing:border-box}.hs a{color:inherit}
-.hs svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.hs-mut{color:var(--ink3)}
-.hs-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 16px;border-radius:12px;color:#fff;background:linear-gradient(90deg,var(--navy),var(--navy2));box-shadow:0 2px 8px rgba(13,58,120,.25);margin-bottom:12px}
-.hs-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff!important}
-.hs-brand .lg{width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.85);display:grid;place-items:center}
-.hs-brand b{display:block;font-size:19px;letter-spacing:.3px;line-height:1.1}.hs-brand small{display:block;font-size:10.5px;opacity:.8;text-transform:uppercase;letter-spacing:.4px}
-.hs-gs{flex:1;min-width:220px;max-width:460px;position:relative;margin:0}
-.hs-gs input{width:100%;height:34px;border:0;border-radius:6px;padding:0 38px 0 12px;background:#fff;color:var(--ink);font:inherit}
-.hs-gs svg{position:absolute;right:10px;top:8px;color:var(--ink2)}
-.hs-tr{margin-left:auto;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-.hs-tb{display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;border-radius:6px;color:#fff!important;text-decoration:none;white-space:nowrap}
-.hs-tb:hover{background:rgba(255,255,255,.12)}
-.hs-shell{display:grid;grid-template-columns:224px 1fr;gap:12px;align-items:start}
-.hs-side{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;position:sticky;top:10px}
-.hs-side a{display:flex;align-items:center;gap:11px;padding:9px 11px;margin-bottom:2px;border-radius:8px;text-decoration:none;font-size:14px;color:var(--ink)}
-.hs-side a svg{width:19px;height:19px;color:var(--navy2)}.hs-side a:hover{background:var(--pri-soft)}
-.hs-side a.on{background:var(--pri);color:#fff;box-shadow:0 2px 6px rgba(31,111,214,.35)}.hs-side a.on svg{color:#fff}
-.hs-side .sep{height:1px;background:var(--line);margin:8px 4px}
-.hs-side .cap{font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);padding:6px 11px 4px}
-.hs-main{min-width:0}
-.hs-card{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
-.hs-dot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
-.hs-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)!important;cursor:pointer;font:inherit;font-size:13px;white-space:nowrap;text-decoration:none!important}
-.hs-btn svg{width:15px;height:15px}.hs-btn:hover{border-color:var(--pri-line);background:#f7faff}
-.hs-btn.pri{background:var(--pri);border-color:var(--pri);color:#fff!important}.hs-btn.pri:hover{background:#185fbd}
-.hs-f{height:32px;border:1px solid var(--line);border-radius:7px;padding:0 10px;background:#fff;font:inherit;color:var(--ink);min-width:0}
-/* the so lieu */
-.hs-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
-.hs-kpi{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.hs-kpi .tp{display:flex;align-items:center;gap:14px}
-.hs-kpi .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:none}.hs-kpi .ic svg{width:26px;height:26px}
-.hs-kpi .num{font-size:28px;font-weight:700;line-height:1.05;color:var(--navy)}.hs-kpi .lb{color:var(--ink2)}
 .sd-stl{list-style:none;margin:0;padding:8px 0 0;border-top:1px solid var(--line2);display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
 .sd-stl button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:2px 0;font:inherit;font-size:13px;color:var(--ink2);cursor:pointer;text-align:left}
 .sd-stl button:hover,.sd-stl button.on{color:var(--pri)}.sd-stl button.on{font-weight:600}
 .sd-stl b{min-width:26px;text-align:right;color:var(--ink)}
-table.hs-gtb{width:100%;border-collapse:collapse;font-size:13px;margin:0;border-top:1px solid var(--line2)}
-table.hs-gtb th,table.hs-gtb td{padding:5px 4px;border:0;background:none;text-align:right;font-weight:600;color:var(--ink)}
-table.hs-gtb thead th{font-size:12px;font-weight:400;color:var(--ink2);padding-top:8px}
-table.hs-gtb tbody th,table.hs-gtb tfoot th{text-align:left;font-weight:400;color:var(--ink2);white-space:nowrap}
-table.hs-gtb tbody th .hs-dot{margin-right:6px}
-table.hs-gtb tfoot th,table.hs-gtb tfoot td{border-top:1px solid var(--line2);font-weight:700}table.hs-gtb tfoot th{color:var(--ink)}
-table.hs-gtb td.tr{color:var(--green)}
-.hs-gt{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line2);padding-top:10px}
-.hs-gt .lg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
-.hs-gt .lg span{display:inline-flex;align-items:center;gap:6px}.hs-gt .lg b{font-size:16px;color:var(--ink)}
-.hs-gt .bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line2)}.hs-gt .bar span{display:block;height:100%}
 .sd-free{display:grid;gap:6px;border-top:1px solid var(--line2);padding-top:10px;font-size:13px;color:var(--ink2)}
 .sd-free div{display:flex;align-items:center;gap:8px}.sd-free b{color:var(--green);font-size:16px}
 /* thanh cong cu */
@@ -160,48 +101,14 @@ table.sd-st a{color:#1f6fd6}
 @media (max-width:640px){.hs{padding:8px}.hs-kpis{grid-template-columns:1fr}.hs-brand small{display:none}.sd-grid{grid-template-columns:repeat(2,1fr)}.sd-bedg{grid-template-columns:repeat(3,minmax(0,1fr))}.sd-stats{grid-template-columns:1fr 1fr 1fr}}
 @media print{.hs-top,.hs-side,.sd-tool,.hs-kpis{display:none!important}.hs-shell{display:block}.hs{background:#fff}.sd-room{break-inside:avoid}}
 </style>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="hi-id" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.4"/><path d="M5.5 17c.6-2 2-3 3.5-3s2.9 1 3.5 3M14.5 9.5h4M14.5 13h4"/></symbol>
-  <symbol id="hi-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.9.1 4.8 1.9 5.4 5.3"/></symbol>
-  <symbol id="hi-bed" viewBox="0 0 24 24"><path d="M3 18V7M3 13h18v5M21 18v-3a3 3 0 0 0-3-3h-7v1"/><circle cx="7" cy="10.5" r="1.8"/></symbol>
-  <symbol id="hi-door" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17M3 21h18"/><circle cx="15" cy="12" r="1"/></symbol>
-  <symbol id="hi-check" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8.5 12 2.3 2.3L15.5 9.6"/></symbol>
-  <symbol id="hi-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.5-.9-1.6-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.8 5.8 1.4 5.8 4.2 0 1.3-1.3 2.1-3 2.1-1.3 0-2.5-.6-3-1.6M12 6v1.8M12 16.2V18"/></symbol>
-  <symbol id="hi-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
-  <symbol id="hi-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
-  <symbol id="hi-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6z"/><path d="M12 9v6M9 12h6"/></symbol>
-  <symbol id="hi-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></symbol>
-  <symbol id="hi-swap" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></symbol>
-  <symbol id="hi-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></symbol>
-  <symbol id="hi-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
-  <symbol id="hi-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="hi-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
-  <symbol id="hi-tool" viewBox="0 0 24 24"><path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.5 2.5-2.5-2.5z"/></symbol>
-  <symbol id="hi-home" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></symbol>
-  <symbol id="hi-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="1.5"/><path d="M7 14h10v7H7z"/></symbol>
-</svg>
-
-<div class="hs">
-  <div class="hs-top">
-    <a class="hs-brand" href="ktx_so_do_phong.php"><span class="lg"><svg class="i"><use href="#hi-bed"/></svg></span><span><b>SƠ ĐỒ PHÒNG – GIƯỜNG</b><small>Ký túc xá · trực quan theo dãy</small></span></a>
-    <label class="hs-gs"><input id="sdQ" placeholder="Tìm phòng hoặc người đang ở (mã phòng, họ tên, MSSV…)" autocomplete="off"><svg class="i"><use href="#hi-search"/></svg></label>
-    <div class="hs-tr">
+<?php ob_start(); ?>
+    <label class="hs-gs"><input id="sdQ" placeholder="Tìm phòng hoặc người đang ở (mã phòng, họ tên, MSSV…)" autocomplete="off"><span class="ico"><svg class="i"><use href="#hi-search"/></svg></span></label>
+<?php $khungGiua = ob_get_clean(); ob_start(); ?>
       <a class="hs-tb" href="ktx_day_phong.php"><svg class="i"><use href="#hi-list"/></svg>Quản lý dạng bảng</a>
-      <a class="hs-tb" href="ktx_thiet_bi.php"><svg class="i"><use href="#hi-tool"/></svg>Thiết bị – CSVC</a>
-      <a class="hs-tb" href="ktx_dashboard.php"><svg class="i"><use href="#hi-home"/></svg>Tổng quan KTX</a>
-    </div>
-  </div>
-
-  <div class="hs-shell">
-    <nav class="hs-side">
-      <div class="cap">Ký túc xá</div>
-      <?php foreach ($MENU as [$f, $t, $ic, $on]): ?><a class="<?= $on ? 'on' : '' ?>" href="<?= h($f) ?>"><svg class="i"><use href="#hi-<?= $ic ?>"/></svg><?= h($t) ?></a><?php endforeach; ?>
-      <div class="sep"></div>
-      <a href="ktx_hoc_vien.php?edit=new"><svg class="i"><use href="#hi-plus"/></svg>Thêm học viên</a>
-    </nav>
-
-    <div class="hs-main">
+      <a class="hs-tb" href="ktx_thiet_bi.php"><svg class="i"><use href="#hi-box"/></svg>Thiết bị – CSVC</a>
+      <a class="hs-tb" href="<?= h(KTX_TRANG_TONG_QUAN) ?>"><svg class="i"><use href="#hi-chart"/></svg>Tổng quan KTX</a>
+<?php $khungPhai = ob_get_clean(); ?>
+<?php ktx_khung_mo('ktx_so_do_phong.php', 'SƠ ĐỒ PHÒNG – GIƯỜNG', 'Ký túc xá · trực quan theo dãy', $khungGiua, $khungPhai); ?>
       <div class="hs-kpis">
         <div class="hs-card hs-kpi">
           <div class="tp"><div class="ic" style="background:var(--pri-soft);color:var(--pri)"><svg class="i"><use href="#hi-door"/></svg></div>
@@ -247,13 +154,11 @@ table.sd-st a{color:#1f6fd6}
         <div class="sd-count" id="sdCount">Đang tải sơ đồ phòng…</div>
         <div class="sd-body" id="sdpGrid"><div class="sd-empty">Đang tải sơ đồ phòng…</div></div>
       </div>
-    </div>
-  </div>
-</div>
+<?php ktx_khung_dong(); ?>
 
-<div class="sd-tip" id="sdpTooltip"></div>
+<div class="sd-tip hs-pop" id="sdpTooltip"></div>
 <div class="sd-ov" id="sdpOverlay" onclick="sdpDongDrawer()"></div>
-<div class="sd-dr" id="sdpDrawer" role="dialog" aria-modal="true" aria-labelledby="sdpDrawerTitle">
+<div class="sd-dr hs-pop" id="sdpDrawer" role="dialog" aria-modal="true" aria-labelledby="sdpDrawerTitle">
   <div class="sd-dh"><div><h3 id="sdpDrawerTitle">Phòng</h3><small id="sdpDrawerSub"></small></div><button type="button" onclick="sdpDongDrawer()" aria-label="Đóng">✕</button></div>
   <div class="sd-db" id="sdpDrawerBody"></div>
 </div>

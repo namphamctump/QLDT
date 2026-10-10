@@ -276,84 +276,13 @@ $o = fn($x) => ($x === null || $x === '') ? '<span class="hs-mut">—</span>' : 
 $ngay = fn($x) => ($x === null || $x === '' || $x === '0000-00-00') ? '<span class="hs-mut">—</span>' : h(format_date_vn($x));
 $tien = fn($n) => number_format((float)$n, 0, ',', '.');
 
-// Menu chuc nang KTX ben trai (giu dung cac trang da co tren thanh nut cu)
-$MENU = [
-    ['ktx_hoc_vien.php', 'Hồ sơ nội trú', 'id', true],
-    ['ktx_so_do_phong.php', 'Sơ đồ Phòng – Giường', 'bed', false],
-    ['ktx_diem_danh.php', 'Điểm danh theo đợt', 'check', false],
-    ['ktx_phi_noi_tru.php', 'Thu phí nội trú', 'coin', false],
-    ['ktx_dien_nuoc.php', 'Điện, nước', 'bolt', false],
-    ['ktx_luu_tru_tam_tru.php', 'Khai báo lưu trú / tạm trú', 'pin', false],
-    ['ktx_ban_quan_ly.php', 'Ban Quản lý KTX', 'shield', false],
-    ['ktx_doi_sv.php', 'Cán sự / Đội SV', 'star', false],
-    ['ktx_doi_chieu_ds.php', 'Đối chiếu danh sách', 'swap', false],
-    ['ktx_thong_bao_email.php', 'Gửi thông báo email', 'mail', false],
-];
 
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/ktx_khung.php';
 ?>
+<?php ktx_khung_css(); ?>
 <style>
 /* ===== Ho so noi tru KTX — giao dien 2026-10-10. Moi lop deu co tien to hs- de khong dung CSS chung cua trang quan tri. ===== */
-.hs{--navy:#0d3a78;--navy2:#134b96;--pri:#1f6fd6;--pri-soft:#e7f0fc;--pri-line:#bcd3f3;--bg:#eef3fa;--line:#dfe7f2;--line2:#edf2f8;
-  --ink:#1c2b41;--ink2:#4b5d75;--ink3:#8494aa;--green:#1f9d55;--green-soft:#e3f6eb;--orange:#f08c00;--orange-soft:#fff3e0;--red:#e03e3e;--red-soft:#fdeaea;--yellow:#f5b400;--violet:#6d4fd8;
-  --shadow:0 1px 2px rgba(16,42,84,.06),0 4px 14px rgba(16,42,84,.06);
-  max-width:1900px;margin:0 auto;padding:12px 14px 24px;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;border-radius:14px}
-.hs *{box-sizing:border-box}.hs a{color:inherit}
-.hs svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.hs-mut{color:var(--ink3)}
-/* dai tieu de */
-.hs-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 16px;border-radius:12px;color:#fff;background:linear-gradient(90deg,var(--navy),var(--navy2));box-shadow:0 2px 8px rgba(13,58,120,.25);margin-bottom:12px}
-.hs-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff!important}
-.hs-brand .lg{width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.85);display:grid;place-items:center}
-.hs-brand b{display:block;font-size:19px;letter-spacing:.3px;line-height:1.1}.hs-brand small{display:block;font-size:10.5px;opacity:.8;text-transform:uppercase;letter-spacing:.4px}
-.hs-gs{flex:1;min-width:220px;max-width:460px;position:relative;margin:0}
-.hs-gs input{width:100%;height:34px;border:0;border-radius:6px;padding:0 38px 0 12px;background:#fff;color:var(--ink);font:inherit}
-.hs-gs button{position:absolute;right:4px;top:4px;height:26px;width:30px;border:0;background:none;color:var(--ink2);cursor:pointer}
-.hs-tr{margin:0 0 0 auto;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-.hs-tb{display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;border:0;border-radius:6px;background:transparent;color:#fff!important;text-decoration:none;white-space:nowrap;font:inherit;cursor:pointer}
-.hs-tb:hover{background:rgba(255,255,255,.12)}
-.hs-tb select{background:transparent;border:0;color:#fff;font:inherit;font-weight:600;cursor:pointer}.hs-tb select option{color:var(--ink)}
-.hs-bell{position:relative}.hs-bell .n{position:absolute;top:1px;right:0;min-width:17px;height:17px;border-radius:9px;background:var(--red);font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
-/* khung 2 cot */
-.hs-shell{display:grid;grid-template-columns:224px 1fr;gap:12px;align-items:start}
-.hs-side{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;position:sticky;top:10px}
-.hs-side a{display:flex;align-items:center;gap:11px;padding:9px 11px;margin-bottom:2px;border-radius:8px;text-decoration:none;font-size:14px;color:var(--ink)}
-.hs-side a svg{width:19px;height:19px;color:var(--navy2)}.hs-side a:hover{background:var(--pri-soft)}
-.hs-side a.on{background:var(--pri);color:#fff;box-shadow:0 2px 6px rgba(31,111,214,.35)}.hs-side a.on svg{color:#fff}
-.hs-side .sep{height:1px;background:var(--line);margin:8px 4px}
-.hs-side .cap{font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink3);padding:6px 11px 4px}
-.hs-main{min-width:0}
-.hs-card{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
-.hs-msg{padding:10px 14px;border-radius:10px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.hs-msg.ok{background:var(--green-soft);border:1px solid #b7e3c8;color:#14653a}.hs-msg.warn{background:#fff6da;border:1px solid #e0c46a;color:#6b5200}
-/* the so lieu */
-.hs-kpis{display:grid;grid-template-columns:1fr 1fr 1fr 1.2fr;gap:12px;margin-bottom:12px}
-.hs-kpi{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
-.hs-kpi .tp{display:flex;align-items:center;gap:14px}
-.hs-kpi .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:none}.hs-kpi .ic svg{width:26px;height:26px}
-.hs-kpi .num{font-size:28px;font-weight:700;line-height:1.05;color:var(--navy)}.hs-kpi .lb{color:var(--ink2)}
-.hs-kpi .sb{display:flex;border-top:1px solid var(--line2);padding-top:10px}
-.hs-kpi .sb div{flex:1;padding:0 8px;border-left:1px solid var(--line2)}.hs-kpi .sb div:first-child{border-left:0;padding-left:0}
-.hs-gt{display:flex;flex-direction:column;gap:6px}
-.hs-gt .lg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
-.hs-gt .lg a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:inherit}.hs-gt .lg a:hover{color:var(--pri)}
-.hs-gt .lg b{font-size:16px;color:var(--ink)}
-.hs-gt .bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line2)}
-.hs-gt .bar span{display:block;height:100%}
-table.hs-gtb{width:100%;border-collapse:collapse;font-size:13px;margin:0;border-top:1px solid var(--line2)}
-table.hs-gtb th,table.hs-gtb td{padding:5px 4px;border:0;background:none;text-align:right;font-weight:600;color:var(--ink)}
-table.hs-gtb thead th{font-size:12px;font-weight:400;color:var(--ink2);padding-top:8px}
-table.hs-gtb tbody th,table.hs-gtb tfoot th{text-align:left;font-weight:400;color:var(--ink2);white-space:nowrap}
-table.hs-gtb tbody th .hs-dot{margin-right:6px}
-table.hs-gtb tfoot th,table.hs-gtb tfoot td{border-top:1px solid var(--line2);font-weight:700}table.hs-gtb tfoot th{color:var(--ink)}
-table.hs-gtb td.tr{color:var(--green)}
-.hs-kpi .sb b{display:block;font-size:18px}.hs-kpi .sb span{font-size:12.5px;color:var(--ink2)}
-.hs-wl{list-style:none;margin:0;padding:0;display:grid;gap:5px}
-.hs-wl a{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2);text-decoration:none}.hs-wl a:hover{color:var(--pri)}
-.hs-wl b{min-width:24px;text-align:right}
-.hs-dot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
-.hs-wh{display:flex;align-items:center;gap:10px}.hs-wh .bd{width:36px;height:36px;border-radius:8px;background:var(--red);color:#fff;display:grid;place-items:center}.hs-wh h3{margin:0;font-size:17px;color:var(--ink)}
-.hs-wh a{margin-left:auto;font-size:12.5px;color:var(--pri)}
 /* bao cao */
 .hs-rep{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:#fbfcfe}
 .hs-rep[hidden]{display:none}
@@ -364,13 +293,6 @@ table.hs-gtb td.tr{color:var(--green)}
 /* thanh cong cu + loc + bang */
 .hs-tool{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line)}
 .hs-tool h2{margin:0 8px 0 2px;font-size:16px;color:var(--navy);white-space:nowrap}
-.hs-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)!important;cursor:pointer;font:inherit;font-size:13px;white-space:nowrap;text-decoration:none!important}
-.hs-btn svg{width:15px;height:15px}.hs-btn:hover{border-color:var(--pri-line);background:#f7faff}
-.hs-btn.pri{background:var(--pri);border-color:var(--pri);color:#fff!important}.hs-btn.pri:hover{background:#185fbd}
-.hs-btn.b svg{color:var(--pri)}.hs-btn.g svg{color:var(--green)}.hs-btn.o svg{color:var(--orange)}.hs-btn.v svg{color:var(--violet)}.hs-btn.r svg{color:var(--red)}
-.hs-btn.r{color:var(--red)!important}.hs-btn.off{opacity:.45;pointer-events:none}
-.hs-sp{flex:1}
-.hs-f{height:32px;border:1px solid var(--line);border-radius:7px;padding:0 10px;background:#fff;font:inherit;color:var(--ink);min-width:0}
 .hs-flt{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);background:#f8fbff;margin:0}
 .hs-flt label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);margin:0;font-weight:400}
 .hs-flt .ttl{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--navy)}
@@ -440,61 +362,21 @@ table.hs-mini .r{text-align:right}
   .hs-shell{display:block}.hs-tw{max-height:none;overflow:visible}.hs-card{box-shadow:none}.hs{background:#fff}
   body.hs-in-ho-so .hs-list{display:none!important}body.hs-in-ho-so .hs-detail{display:block!important}body.hs-in-ho-so .hs-pane{display:block!important;margin-bottom:12px}}
 </style>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="hi-id" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.4"/><path d="M5.5 17c.6-2 2-3 3.5-3s2.9 1 3.5 3M14.5 9.5h4M14.5 13h4"/></symbol>
-  <symbol id="hi-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.9.1 4.8 1.9 5.4 5.3"/></symbol>
-  <symbol id="hi-bed" viewBox="0 0 24 24"><path d="M3 18V7M3 13h18v5M21 18v-3a3 3 0 0 0-3-3h-7v1"/><circle cx="7" cy="10.5" r="1.8"/></symbol>
-  <symbol id="hi-check" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8.5 12 2.3 2.3L15.5 9.6"/></symbol>
-  <symbol id="hi-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.5-.9-1.6-1.4-2.8-1.4-1.6 0-2.8.8-2.8 2.1 0 2.8 5.8 1.4 5.8 4.2 0 1.3-1.3 2.1-3 2.1-1.3 0-2.5-.6-3-1.6M12 6v1.8M12 16.2V18"/></symbol>
-  <symbol id="hi-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
-  <symbol id="hi-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
-  <symbol id="hi-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6z"/><path d="M12 9v6M9 12h6"/></symbol>
-  <symbol id="hi-star" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></symbol>
-  <symbol id="hi-swap" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></symbol>
-  <symbol id="hi-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></symbol>
-  <symbol id="hi-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
-  <symbol id="hi-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
-  <symbol id="hi-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="hi-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
-  <symbol id="hi-trash" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></symbol>
-  <symbol id="hi-down" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></symbol>
-  <symbol id="hi-print" viewBox="0 0 24 24"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="1.5"/><path d="M7 14h10v7H7z"/></symbol>
-  <symbol id="hi-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4 1.5v-8z"/></symbol>
-  <symbol id="hi-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4.5M12 17.2h.01"/></symbol>
-  <symbol id="hi-home" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></symbol>
-  <symbol id="hi-file" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8.5 13h7M8.5 16.5h5"/></symbol>
-  <symbol id="hi-folder" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5H9l2 2.5h8.5A1.5 1.5 0 0 1 21 9v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/></symbol>
-  <symbol id="hi-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
-  <symbol id="hi-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
-  <symbol id="hi-save" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></symbol>
-</svg>
-
-<div class="hs">
-  <div class="hs-top">
-    <a class="hs-brand" href="ktx_hoc_vien.php"><span class="lg"><svg class="i"><use href="#hi-bed"/></svg></span><span><b>HỒ SƠ NỘI TRÚ KTX</b><small>Quản lý người học ở nội trú</small></span></a>
+<?php ob_start(); ?>
     <form class="hs-gs" method="get" action="ktx_hoc_vien.php">
       <input type="hidden" name="trang_thai" value="">
       <input name="q" value="<?= h($q) ?>" placeholder="Tìm người học (mã số, họ tên, CCCD, SĐT, phòng, giường…)">
       <button title="Tìm"><svg class="i"><use href="#hi-search"/></svg></button>
     </form>
-    <form class="hs-tr" method="get">
+<?php $khungGiua = ob_get_clean(); ob_start(); ?>
+    <form method="get" style="display:flex;align-items:center;gap:4px;margin:0">
       <?php foreach (['q' => $q, 'day_id' => $dayId ?: '', 'trang_thai' => $trangThai, 'gioi_tinh' => $gioiTinhLoc, 'nhanh' => $locNhanh, 'id' => $showForm ? '' : ($idChon ?: '')] as $k => $val): ?><input type="hidden" name="<?= $k ?>" value="<?= h((string)$val) ?>"><?php endforeach; ?>
       <a class="hs-tb hs-bell" href="#hs-canh-bao" title="Cảnh báo hồ sơ"><svg class="i" style="width:22px;height:22px"><use href="#hi-bell"/></svg><span class="n"><?= $tongCanhBao ?></span></a>
       <span class="hs-tb">Năm <select name="nam" onchange="this.form.submit()"><?php for ($y = (int)date('Y') - 2; $y <= (int)date('Y') + 1; $y++): ?><option <?= $y === $namXem ? 'selected' : '' ?>><?= $y ?></option><?php endfor; ?></select></span>
       <span class="hs-tb">Tháng <select name="thang" onchange="this.form.submit()"><?php for ($m = 1; $m <= 12; $m++): ?><option <?= $m === $thangXem ? 'selected' : '' ?>><?= $m ?></option><?php endfor; ?></select></span>
     </form>
-  </div>
-
-  <div class="hs-shell">
-    <nav class="hs-side">
-      <div class="cap">Ký túc xá</div>
-      <?php foreach ($MENU as [$f, $t, $ic, $on]): ?><a class="<?= $on ? 'on' : '' ?>" href="<?= h($f) ?>"><svg class="i"><use href="#hi-<?= $ic ?>"/></svg><?= h($t) ?></a><?php endforeach; ?>
-      <div class="sep"></div>
-      <a href="?edit=new"><svg class="i"><use href="#hi-plus"/></svg>Thêm học viên</a>
-    </nav>
-
-    <div class="hs-main">
+<?php $khungPhai = ob_get_clean(); ?>
+<?php ktx_khung_mo('ktx_hoc_vien.php', 'HỒ SƠ NỘI TRÚ KTX', 'Quản lý người học ở nội trú', $khungGiua, $khungPhai); ?>
       <?php if (!empty($_GET['saved'])): ?>
       <div class="hs-msg ok"><span>✅ Đã lưu.</span><?php if ($showForm): ?><a class="hs-btn" href="ktx_hoc_vien.php<?= $editRow ? '?id=' . (int)$editRow['id'] . '#ho-so' : '' ?>">← Về danh sách / hồ sơ</a><?php endif; ?></div>
       <?php endif; ?>
@@ -925,7 +807,5 @@ table.hs-mini .r{text-align:right}
       });
       </script>
       <?php endif; ?>
-    </div>
-  </div>
-</div>
+<?php ktx_khung_dong(); ?>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
