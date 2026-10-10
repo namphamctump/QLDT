@@ -189,7 +189,21 @@ foreach ($pdo->query("SELECT gioi_tinh, COUNT(*) AS n FROM ktx_hoc_vien WHERE tr
 }
 $demDaXep = (int)$pdo->query("SELECT COUNT(*) FROM ktx_hoc_vien WHERE trang_thai = 'dang_o' AND phong_id IS NOT NULL")->fetchColumn();
 $sucChua = 0; $soPhongSd = 0;
-foreach ($phongList as $p) { if (($p['tinh_trang'] ?? '') !== 'ngung_su_dung') { $sucChua += (int)$p['suc_chua']; $soPhongSd++; } }
+// Giuong theo gioi tinh cua Day (ktx_day.gioi_tinh): suc chua, da o, trong — chi tinh phong dang su dung
+$giuongGt = [];
+foreach ($phongList as $p) {
+    if (($p['tinh_trang'] ?? '') === 'ngung_su_dung') { continue; }
+    $sucChua += (int)$p['suc_chua']; $soPhongSd++;
+    $g = in_array($p['day_gioi_tinh'], ['Nam', 'Nữ'], true) ? $p['day_gioi_tinh'] : 'Khác';
+    $giuongGt[$g] = $giuongGt[$g] ?? ['tong' => 0, 'o' => 0, 'trong' => 0, 'phong' => 0];
+    $giuongGt[$g]['tong'] += (int)$p['suc_chua'];
+    $giuongGt[$g]['o'] += (int)$p['dang_o'];
+    $giuongGt[$g]['trong'] += max(0, (int)$p['suc_chua'] - (int)$p['dang_o']);
+    $giuongGt[$g]['phong']++;
+}
+uksort($giuongGt, fn($a, $b) => array_search($a, ['Nam', 'Nữ', 'Khác']) <=> array_search($b, ['Nam', 'Nữ', 'Khác']));
+$giuongTrong = array_sum(array_column($giuongGt, 'trong'));
+$giuongDaO = array_sum(array_column($giuongGt, 'o'));
 $demRoiThangNay = $pdo->prepare("SELECT COUNT(*) FROM ktx_hoc_vien WHERE trang_thai = 'da_roi' AND ngay_thanh_ly_hd >= ? AND ngay_thanh_ly_hd < ?");
 $dauThang = sprintf('%04d-%02d-01', $namXem, $thangXem);
 $dauThangSau = $thangXem === 12 ? sprintf('%04d-01-01', $namXem + 1) : sprintf('%04d-%02d-01', $namXem, $thangXem + 1);
@@ -326,6 +340,13 @@ require_once __DIR__ . '/../includes/header.php';
 .hs-gt .lg b{font-size:16px;color:var(--ink)}
 .hs-gt .bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line2)}
 .hs-gt .bar span{display:block;height:100%}
+table.hs-gtb{width:100%;border-collapse:collapse;font-size:13px;margin:0;border-top:1px solid var(--line2)}
+table.hs-gtb th,table.hs-gtb td{padding:5px 4px;border:0;background:none;text-align:right;font-weight:600;color:var(--ink)}
+table.hs-gtb thead th{font-size:12px;font-weight:400;color:var(--ink2);padding-top:8px}
+table.hs-gtb tbody th,table.hs-gtb tfoot th{text-align:left;font-weight:400;color:var(--ink2);white-space:nowrap}
+table.hs-gtb tbody th .hs-dot{margin-right:6px}
+table.hs-gtb tfoot th,table.hs-gtb tfoot td{border-top:1px solid var(--line2);font-weight:700}table.hs-gtb tfoot th{color:var(--ink)}
+table.hs-gtb td.tr{color:var(--green)}
 .hs-kpi .sb b{display:block;font-size:18px}.hs-kpi .sb span{font-size:12.5px;color:var(--ink2)}
 .hs-wl{list-style:none;margin:0;padding:0;display:grid;gap:5px}
 .hs-wl a{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2);text-decoration:none}.hs-wl a:hover{color:var(--pri)}
@@ -634,11 +655,16 @@ table.hs-mini .r{text-align:right}
         <div class="hs-card hs-kpi">
           <div class="tp"><div class="ic" style="background:var(--green-soft);color:var(--green)"><svg class="i"><use href="#hi-bed"/></svg></div>
             <div><div class="num"><?= $sucChua ? round($demDaXep / $sucChua * 100) : 0 ?>%</div><div class="lb">Công suất giường</div></div></div>
-          <div class="sb">
-            <div><b><?= $demDaXep ?></b><span>Giường đã ở</span></div>
-            <div><b><?= max(0, $sucChua - $demDaXep) ?></b><span>Giường trống</span></div>
-            <div><b><?= $soPhongSd ?></b><span>Phòng sử dụng</span></div>
-          </div>
+          <table class="hs-gtb">
+            <thead><tr><th></th><th>Đã ở</th><th>Trống</th><th>Tổng</th></tr></thead>
+            <tbody>
+            <?php foreach ($giuongGt as $g => $x): ?>
+              <tr><th><span class="hs-dot" style="background:<?= $g === 'Nam' ? '#1f6fd6' : ($g === 'Nữ' ? '#d6457a' : '#98a4b5') ?>"></span>Giường <?= h(mb_strtolower($g)) ?></th>
+                <td title="<?= $x['o'] > $x['tong'] ? 'Có phòng đang ở vượt sức chứa' : '' ?>"><?= $x['o'] ?></td><td class="<?= $x['trong'] ? 'tr' : '' ?>"><?= $x['trong'] ?></td><td><?= $x['tong'] ?></td></tr>
+            <?php endforeach; ?>
+            </tbody>
+            <tfoot><tr><th>Cộng (<?= $soPhongSd ?> phòng)</th><td><?= $giuongDaO ?></td><td class="<?= $giuongTrong ? 'tr' : '' ?>"><?= $giuongTrong ?></td><td><?= $sucChua ?></td></tr></tfoot>
+          </table>
         </div>
         <div class="hs-card hs-kpi">
           <div class="tp"><div class="ic" style="background:var(--orange-soft);color:var(--orange)"><svg class="i"><use href="#hi-coin"/></svg></div>
