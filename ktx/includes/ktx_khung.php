@@ -38,24 +38,30 @@ function ktx_khung_menu(): array {
     ];
 }
 
-function ktx_khung_mo(string $trangHienTai, string $tieuDe, string $phuDe, string $giuaHtml = '', string $phaiHtml = ''): void {
+// $menu: [[ten nhom, [[file, nhan, icon], ...]], ...] — mac dinh menu KTX; nhanh khac (VD Hoi CCB, xem
+// includes/hccb_khung.php) truyen menu rieng. $logoHtml thay bieu tuong o dai tieu de; $nutCuoi = [href, nhan]
+// la nut nhanh cuoi menu (null = an).
+function ktx_khung_mo(string $trangHienTai, string $tieuDe, string $phuDe, string $giuaHtml = '', string $phaiHtml = '', ?array $menu = null, string $logoHtml = '', ?array $nutCuoi = ['ktx_hoc_vien.php?edit=new', 'Thêm học viên']): void {
+    $menu = $menu ?? ktx_khung_menu();
     ktx_khung_css();
     ktx_khung_icon();
     ?>
 <div class="hs">
   <div class="hs-top">
-    <a class="hs-brand" href="<?= h($trangHienTai) ?>"><span class="lg"><svg class="i"><use href="#hi-bed"/></svg></span><span><b><?= h($tieuDe) ?></b><small><?= h($phuDe) ?></small></span></a>
+    <a class="hs-brand" href="<?= h($trangHienTai) ?>"><span class="lg"><?= $logoHtml !== '' ? $logoHtml : '<svg class="i"><use href="#hi-bed"/></svg>' ?></span><span><b><?= h($tieuDe) ?></b><small><?= h($phuDe) ?></small></span></a>
     <?= $giuaHtml ?>
     <?php if ($phaiHtml !== ''): ?><div class="hs-tr"><?= $phaiHtml ?></div><?php endif; ?>
   </div>
   <div class="hs-shell">
     <nav class="hs-side" aria-label="Chức năng Ký túc xá">
-      <?php foreach (ktx_khung_menu() as [$nhom, $muc]): ?>
+      <?php foreach ($menu as [$nhom, $muc]): ?>
         <div class="cap"><?= h($nhom) ?></div>
         <?php foreach ($muc as [$f, $t, $ic]): ?><a class="<?= $f === $trangHienTai ? 'on' : '' ?>" href="<?= h($f) ?>"<?= $f === $trangHienTai ? ' aria-current="page"' : '' ?>><svg class="i"><use href="#hi-<?= $ic ?>"/></svg><?= h($t) ?></a><?php endforeach; ?>
       <?php endforeach; ?>
+      <?php if ($nutCuoi): ?>
       <div class="sep"></div>
-      <a href="ktx_hoc_vien.php?edit=new"><svg class="i"><use href="#hi-plus"/></svg>Thêm học viên</a>
+      <a href="<?= h($nutCuoi[0]) ?>"><svg class="i"><use href="#hi-plus"/></svg><?= h($nutCuoi[1]) ?></a>
+      <?php endif; ?>
     </nav>
     <div class="hs-main">
     <?php
@@ -84,7 +90,8 @@ function ktx_khung_css(): void {
 /* dai tieu de */
 .hs-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px 16px;border-radius:12px;color:#fff;background:linear-gradient(90deg,var(--navy),var(--navy2));box-shadow:0 2px 8px rgba(13,58,120,.25);margin-bottom:12px}
 .hs-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff!important}
-.hs-brand .lg{width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.85);display:grid;place-items:center}
+.hs-brand .lg{width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.85);display:grid;place-items:center;overflow:hidden;background:rgba(255,255,255,.08)}
+.hs-brand .lg img{width:30px;height:30px;object-fit:contain}
 .hs-brand b{display:block;font-size:19px;letter-spacing:.3px;line-height:1.1}.hs-brand small{display:block;font-size:10.5px;opacity:.8;text-transform:uppercase;letter-spacing:.4px}
 .hs-gs{flex:1;min-width:220px;max-width:460px;position:relative;margin:0}
 .hs-gs input{width:100%;height:34px;border:0;border-radius:6px;padding:0 38px 0 12px;background:#fff;color:var(--ink);font:inherit}
@@ -214,6 +221,10 @@ function ktx_khung_icon(): void {
   <symbol id="hi-save" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></symbol>
   <symbol id="hi-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
   <symbol id="hi-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+  <symbol id="hi-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8.5-8.5M16 7l2.5 2.5M14.5 8.5 17 11"/></symbol>
+  <symbol id="hi-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
+  <symbol id="hi-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+  <symbol id="hi-medal" viewBox="0 0 24 24"><circle cx="12" cy="15" r="5"/><path d="m8.5 11-3-8h4l2.5 5M15.5 11l3-8h-4L12 8"/></symbol>
   <symbol id="hi-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
 </svg>
     <?php
